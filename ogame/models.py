@@ -76,3 +76,16 @@ class PlanetsMultiverse(models.Model):
 
     class Meta:
         db_table = "planets_multiverse"
+
+class Fight(models.Model):
+    round = models.fields.IntegerField(default=0, blank=True, null=True)
+    life_points_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+    life_points_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+    fire_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+    fire_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+    shield_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+    shield_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+    winner = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+
+    class Meta:
+        db_table = "fight"

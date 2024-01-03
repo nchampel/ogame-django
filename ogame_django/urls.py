@@ -23,7 +23,7 @@ GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoost
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
 from ogame.views.views_planets_multiverse import GetPlanetsMultiverseDataAPIView, CreatePlanetsMultiverseAPIView,\
-SaveResourcesPlanetsMultiverseAPIView
+SaveResourcesPlanetsMultiverseAPIView, GetResultsAttackAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,6 +38,7 @@ urlpatterns = [
     path('planets/resources/save/', SaveResourcesPlanetsAPIView.as_view()),
     path('planets/multiverse/get/', GetPlanetsMultiverseDataAPIView.as_view()),
     path('planets/multiverse/resources/save/', SaveResourcesPlanetsMultiverseAPIView.as_view()),
+    path('planets/multiverse/attack/results/get/', GetResultsAttackAPIView.as_view()),
 
     path('planets/create/', CreatePlanetsAPIView.as_view()),
     path('planets/multiverse/create/', CreatePlanetsMultiverseAPIView.as_view()),
