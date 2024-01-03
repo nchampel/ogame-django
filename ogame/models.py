@@ -6,6 +6,7 @@ class Resources(models.Model):
     crystal = models.fields.IntegerField(default=0, blank=True, null=True)
     deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
     energy = models.fields.IntegerField(default=0, blank=True, null=True)
+    satellites = models.fields.IntegerField(default=0, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "resources"

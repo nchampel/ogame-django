@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from ogame.views import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
-GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
-CreatePlanetsAPIView, GetPlanetsDataAPIView, SaveResourcesPlanetsAPIView, SaveResourcesPlanetsMultiverseAPIView, \
-CreatePlanetsMultiverseAPIView, GetPlanetsMultiverseDataAPIView
+from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
+GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView
+
+from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
+
+from ogame.views.views_planets_multiverse import GetPlanetsMultiverseDataAPIView, CreatePlanetsMultiverseAPIView,\
+SaveResourcesPlanetsMultiverseAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
