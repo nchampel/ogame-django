@@ -73,3 +73,4 @@ class SaveResourcesPlanetsAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde des ressources des planètes'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        

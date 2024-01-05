@@ -6,7 +6,7 @@ from django.utils import timezone
 from random import randrange, shuffle, uniform
 from environ import Env
 
-from ogame.models import PlanetsMultiverse, Resources
+from ogame.models import PlanetsMultiverse, Resources, Starship
 
 from ogame.serializers import PlanetsMultiverseSerializer
 
@@ -94,7 +94,14 @@ class SaveResourcesPlanetsMultiverseAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde des ressources des planètes multivers'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        
+
+def handleResourcesAttackedPlanet(planet, resources):
+    resources['metal'] += planet['metal']
+    resources['crystal'] += planet['crystal']
+    resources['deuterium'] += planet['deuterium']
+    Resources.objects.filter(id=USER_ID).update(metal=resources['metal'],
+                        crystal=resources['crystal'], deuterium=resources['deuterium'])
+    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=0, crystal=0, deuterium=0)
 class GetResultsAttackAPIView(APIView):
     def post(self, request):
         try :
@@ -102,10 +109,10 @@ class GetResultsAttackAPIView(APIView):
             starship_levels = request.data['starshipLevels']
             resources = request.data['resources']
             
-            results = [{'winner': '', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
-                        'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10},
-                        {'winner': 'Player', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
-                        'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10}]
+            # results = [{'winner': '', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
+            #             'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10},
+            #             {'winner': 'Player', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
+            #             'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10}]
             
             winner = ''
             round = 1
@@ -116,6 +123,8 @@ class GetResultsAttackAPIView(APIView):
                 if round == 1:
                     life_starship = int(10 * 1.7 ** (starship_levels['life_level'] - 1))
                     life_enemy = int(10 * 1.7 ** (planet['life_level'] - 1))
+                    if planet['type'] == 'boss':
+                        boss_life = life_enemy
                 fire_starship = int(8 * uniform(0.9, 1.5) ** (starship_levels['fire_level'] - 1))
                 shield_starship = int(5 * uniform(1.1, 1.5) ** (starship_levels['shield_level'] - 1))
                 fire_enemy = int(8 * uniform(0.9, 1.5) ** (planet['fire_level'] - 1))
@@ -125,24 +134,35 @@ class GetResultsAttackAPIView(APIView):
                     life_starship = life_starship - (fire_enemy - shield_starship)
                 if shield_enemy <= fire_starship:
                     life_enemy = life_enemy - (fire_starship - shield_enemy)
+
+                has_exploded = False
+                if planet['type'] == 'boss':
+                    if life_enemy < boss_life / 2 and life_enemy >= boss_life / 4 and randrange(0, 6) == 0:
+                        life_enemy = 0
+                        has_exploded = True
+                    if life_enemy < boss_life / 4 and life_enemy >= boss_life / 10 and randrange(0, 5) == 0:
+                        life_enemy = 0
+                        has_exploded = True
+                    if life_enemy < boss_life / 10 and randrange(0, 4) == 0:
+                        life_enemy = 0
+                        has_exploded = True
                 
                 if life_enemy <= 0:
                     life_enemy = 0
                     winner = 'Player'
-                    resources['metal'] += planet['metal']
-                    resources['crystal'] += planet['crystal']
-                    resources['deuterium'] += planet['deuterium']
-                    # Resources.objects.filter(id=1).update(metal=resources['metal'],
-                    #                     crystal=resources['crystal'], deuterium=resources['deuterium'])
+                    handleResourcesAttackedPlanet(planet, resources)
 
 
                 if life_starship <= 0:
                     life_starship = 0
                     winner = 'Enemy'
                     # détruire le vaisseau
+                    Starship.objects.filter(id=USER_ID).update(is_built=0)
+                    
 
                 results.append({'winner': winner, 'round': round, 'life_points_starship': life_starship, 'life_points_enemy': life_enemy,
-                        'shield_starship': shield_starship, 'fire_starship': fire_starship, 'shield_enemy': shield_enemy, 'fire_enemy': fire_enemy})
+                        'shield_starship': shield_starship, 'fire_starship': fire_starship, 'shield_enemy': shield_enemy, 'fire_enemy': fire_enemy,
+                        'exploded': has_exploded})
 
                 round += 1
 
@@ -150,5 +170,34 @@ class GetResultsAttackAPIView(APIView):
         except:
             content = {
                 'msg': 'Erreur lors de l\'attaque de la planète multivers'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class SaveDiscoveredPlanetAPIView(APIView):
+    def post(self, request):
+        try :
+            planet_id = request.data['planet_id']
+
+            PlanetsMultiverse.objects.filter(id=planet_id).update(is_discovered=1)
+
+            return JsonResponse({'msg': 'Découverte de la planète multivers sauvegardée'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde de la planète multivers'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class GetResourcesAttackAPIView(APIView):
+    def post(self, request):
+        try :
+            planet = request.data['planet']
+            resources = request.data['resources']
+
+            handleResourcesAttackedPlanet(planet, resources)
+
+            return JsonResponse({'msg': 'Ressources volées de la planète multivers attaquée sauvegardée'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde de la planète multivers ressource'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
