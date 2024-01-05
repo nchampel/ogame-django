@@ -63,15 +63,19 @@ class GetPlanetsMultiverseDataAPIView(APIView):
     def post(self, request):
         try :
             planets = PlanetsMultiverse.objects.filter(user_id=USER_ID).all()
-            serializer = PlanetsMultiverseSerializer(planets, many=True).data
+            serializer_all = PlanetsMultiverseSerializer(planets, many=True).data
+            shuffle(serializer_all)
+            
+            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID, is_discovered=1)
+            serializer_discovered = PlanetsMultiverseSerializer(planets, many=True).data
+            shuffle(serializer_discovered)
+            
+            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID,  is_discovered=0)
+            serializer_not_discovered = PlanetsMultiverseSerializer(planets, many=True).data
+            shuffle(serializer_not_discovered)
 
-            # for idx, planet in enumerate(serializer):
-            #     resources_on_planet = planet['metal'] + planet['crystal'] + planet['deuterium']
-            #     serializer[idx]['cost'] = round(resources_on_planet / 10)
-
-            shuffle(serializer)
-
-            return Response(serializer)
+            return JsonResponse({'all': serializer_all, 'discovered': serializer_discovered,
+                                 'not_discovered': serializer_not_discovered})
         except:
             content = {
                 'msg': 'Erreur lors de la récupération des données des planètes multivers'
@@ -187,17 +191,17 @@ class SaveDiscoveredPlanetAPIView(APIView):
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         
-class GetResourcesAttackAPIView(APIView):
-    def post(self, request):
-        try :
-            planet = request.data['planet']
-            resources = request.data['resources']
+# class GetResourcesAttackAPIView(APIView):
+#     def post(self, request):
+#         try :
+#             planet = request.data['planet']
+#             resources = request.data['resources']
 
-            handleResourcesAttackedPlanet(planet, resources)
+#             handleResourcesAttackedPlanet(planet, resources)
 
-            return JsonResponse({'msg': 'Ressources volées de la planète multivers attaquée sauvegardée'})
-        except:
-            content = {
-                'msg': 'Erreur lors de la sauvegarde de la planète multivers ressource'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+#             return JsonResponse({'msg': 'Ressources volées de la planète multivers attaquée sauvegardée'})
+#         except:
+#             content = {
+#                 'msg': 'Erreur lors de la sauvegarde de la planète multivers ressource'
+#             }
+#             return Response(content, status=status.HTTP_400_BAD_REQUEST)
