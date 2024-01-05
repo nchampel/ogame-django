@@ -2,16 +2,23 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from django.utils import timezone
+from environ import Env
 
-from ogame.models import Resources, Buildings, BuildingsResources, Boosters
+from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
+Planets, PlanetsMultiverse
 
 from ogame.serializers import BuildingsSerializer, ResourcesSerializer
+
+env = Env()
+env.read_env()
+USER_ID = int(env("USER_ID"))
 
 class GetResourcesAPIView(APIView):
     def post(self, request):
         try :
             # courses_id = escape(request.data['courses_id'])
-            resource = Resources.objects.filter(id=1).first()
+            resource = Resources.objects.filter(user_id=USER_ID).first()
             serializer = ResourcesSerializer(resource).data
 
             return JsonResponse(serializer)
@@ -25,7 +32,7 @@ class SaveResourcesAPIView(APIView):
     def post(self, request):
         try :
             resources = request.data['resources']
-            resource = Resources.objects.filter(id=1).update(metal=resources['metal'],
+            resource = Resources.objects.filter(user_id=USER_ID).update(metal=resources['metal'],
                                         crystal=resources['crystal'], deuterium=resources['deuterium'],
                                         satellites=resources['satellites'])
             # resources_values = {'metal': resource.metal}
@@ -41,7 +48,7 @@ class GetBuildingsAPIView(APIView):
     def post(self, request):
         try :
             # courses_id = escape(request.data['courses_id'])
-            building = Buildings.objects.filter(id=1).first()
+            building = Buildings.objects.filter(user_id=USER_ID).first()
             serializer = BuildingsSerializer(building).data
             return JsonResponse(serializer)
         except:
@@ -49,6 +56,8 @@ class GetBuildingsAPIView(APIView):
                 'msg': 'Erreur lors de la récupération des ressources'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+# pas utilisé
 class GetBuildingsResourcesAPIView(APIView):
     def post(self, request):
         try :
@@ -86,7 +95,22 @@ class SaveLevelAPIView(APIView):
         try :
             type = request.data['type']
             level = request.data['level']
-            Buildings.objects.filter(id=1).update(**{type: level})
+            Buildings.objects.filter(user_id=USER_ID).update(**{type: level})
+            # resources_values = {'metal': resource.metal}
+
+            return JsonResponse({'msg': 'Ressources ajoutées'})
+        except:
+            content = {
+                'msg': 'Erreur lors de l\'ajout des ressources'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class SaveSearchLevelAPIView(APIView):
+    def post(self, request):
+        try :
+            type = request.data['type']
+            level = request.data['level']
+            Buildings.objects.filter(user_id=USER_ID).update(**{type: level})
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources ajoutées'})
@@ -112,7 +136,7 @@ class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
         try :
             coefficient = request.data['coefficient']
-            Buildings.objects.filter(id=1).update(booster=coefficient)
+            Buildings.objects.filter(user_id=USER_ID).update(booster=coefficient)
 
             booster = Boosters.objects.filter(coefficient=coefficient).first()
 
@@ -120,5 +144,25 @@ class SaveBoosterCoefficientAPIView(APIView):
         except:
             content = {
                 'msg': 'Erreur lors de la sauvegarde du niveau du booster'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class ReinitializationAPIView(APIView):
+    def post(self, request):
+        try :
+            user_id = request.data['user_id']
+            Buildings.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0, energy=0,
+                                                             booster=1, life_level=0, fire_level=0, shield_level=0, created_at=timezone.now())
+            Resources.objects.filter(user_id=user_id).update(metal=200, crystal=50, deuterium=0,
+                                                             satellites=0, created_at=timezone.now())
+            Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0)
+            PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0,
+                                                                     is_discovered=0)
+            
+
+            return JsonResponse({'msg': 'Réinitialisation réussie'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la réinitialisation'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)

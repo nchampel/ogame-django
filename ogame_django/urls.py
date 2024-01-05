@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path
 
 from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
-GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView
+GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
+ReinitializationAPIView, SaveSearchLevelAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -29,9 +30,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('resources/get/', GetResourcesAPIView.as_view()),
     path('buildings/get/', GetBuildingsAPIView.as_view()),
+    # pas utilisé
     path('buildings-resources/get/', GetBuildingsResourcesAPIView.as_view()),
     path('resources/save/', SaveResourcesAPIView.as_view()),
     path('level/save/', SaveLevelAPIView.as_view()),
+    path('search/level/save/', SaveSearchLevelAPIView.as_view()),
     path('booster/cost/get/', GetBoosterCostAPIView.as_view()),
     path('booster/coefficient/save/', SaveBoosterCoefficientAPIView.as_view()),
     path('planets/get/', GetPlanetsDataAPIView.as_view()),
@@ -42,4 +45,6 @@ urlpatterns = [
 
     path('planets/create/', CreatePlanetsAPIView.as_view()),
     path('planets/multiverse/create/', CreatePlanetsMultiverseAPIView.as_view()),
+    path('reinitialization/', ReinitializationAPIView.as_view()),
+
 ]

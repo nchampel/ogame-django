@@ -2,17 +2,23 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-
+from django.utils import timezone
 from random import randrange
+from environ import Env
 
 from ogame.models import Planets
 
 from ogame.serializers import PlanetsSerializer
 
+env = Env()
+env.read_env()
+USER_ID = int(env("USER_ID"))
+
 class CreatePlanetsAPIView(APIView):
     def get(self, request):
         try :
             planets_to_create = []
+            user_id = 2
             for i in range(10):
                 for t in range(10):
                     name = str(i) + '.' + str(t + 1)
@@ -22,7 +28,7 @@ class CreatePlanetsAPIView(APIView):
                     # if i == 0:
                     # print(name)
                     # print(metal_level)
-                    planets_to_create.append(Planets(name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level))
+                    planets_to_create.append(Planets(user_id=user_id, name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level, created_at=timezone.now()))
             Planets.objects.bulk_create(planets_to_create)
 
             # booster = Boosters.objects.filter(coefficient=coefficient).first()
@@ -37,7 +43,7 @@ class CreatePlanetsAPIView(APIView):
 class GetPlanetsDataAPIView(APIView):
     def post(self, request):
         try :
-            planets = Planets.objects.all()
+            planets = Planets.objects.filter(user_id=USER_ID).all()
             serializer = PlanetsSerializer(planets, many=True).data
 
             for idx, planet in enumerate(serializer):

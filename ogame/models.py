@@ -7,6 +7,7 @@ class Resources(models.Model):
     deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
     energy = models.fields.IntegerField(default=0, blank=True, null=True)
     satellites = models.fields.IntegerField(default=0, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "resources"
@@ -21,10 +22,12 @@ class Buildings(models.Model):
     life_level = models.fields.IntegerField(default=1, blank=True, null=True)
     fire_level = models.fields.IntegerField(default=1, blank=True, null=True)
     shield_level = models.fields.IntegerField(default=1, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "buildings"
 
+# pas utilisé
 class BuildingsResources(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     type = models.fields.CharField(max_length=50)
@@ -54,6 +57,8 @@ class Planets(models.Model):
     metal_level = models.fields.IntegerField(default=0, blank=True, null=True)
     crystal_level = models.fields.IntegerField(default=0, blank=True, null=True)
     deuterium_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
 
     class Meta:
         db_table = "planets"
@@ -72,7 +77,9 @@ class PlanetsMultiverse(models.Model):
     life_level = models.fields.IntegerField(default=0, blank=True, null=True)
     fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
     shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     is_discovered = models.fields.BooleanField(default=0, blank=True, null=True)
+    created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
 
     class Meta:
         db_table = "planets_multiverse"

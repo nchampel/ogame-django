@@ -2,17 +2,22 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-
+from django.utils import timezone
 from random import randrange, shuffle, uniform
+from environ import Env
 
 from ogame.models import PlanetsMultiverse, Resources
 
 from ogame.serializers import PlanetsMultiverseSerializer
 
+env = Env()
+env.read_env()
+USER_ID = int(env("USER_ID"))
 class CreatePlanetsMultiverseAPIView(APIView):
     def get(self, request):
         try :
             planets_to_create = []
+            user_id = 2
             for i in range(10):
                 for t in range(50):
                     name = str(i) + '.' + str(t + 1)
@@ -26,22 +31,22 @@ class CreatePlanetsMultiverseAPIView(APIView):
                     # if i == 0:
                     if has_headquarter == 0:
                         planets_to_create.append(
-                            PlanetsMultiverse(name=name, metal_level=metal_level, type=type,
+                            PlanetsMultiverse(user_id=user_id, name=name, metal_level=metal_level, type=type,
                                             crystal_level=crystal_level, deuterium_level=deuterium_level,
-                                            has_headquarter=has_headquarter))
+                                            has_headquarter=has_headquarter, created_at=timezone.now()))
                     else:
                         planets_to_create.append(
-                            PlanetsMultiverse(name=name, metal_level=metal_level, type=type,
+                            PlanetsMultiverse(user_id=user_id, name=name, metal_level=metal_level, type=type,
                                             crystal_level=crystal_level, deuterium_level=deuterium_level,
                                             has_headquarter=has_headquarter,
                                             life_level=randrange(1, 50), fire_level=randrange(1, 50),
-                                            shield_level=randrange(1, 50)))
+                                            shield_level=randrange(1, 50), created_at=timezone.now()))
             # création du boss
-            planets_to_create.append(PlanetsMultiverse(name=str(randrange(0, 10)) + '.' + str(randrange(0, 51)), type='boss',
+            planets_to_create.append(PlanetsMultiverse(user_id=user_id, name=str(randrange(0, 10)) + '.' + str(randrange(0, 51)), type='boss',
                                             crystal_level=randrange(80, 250), deuterium_level=randrange(80, 250),
                                             has_headquarter=1, metal_level=randrange(80, 250), 
                                             life_level=randrange(50, 70), fire_level=randrange(50, 70),
-                                            shield_level=randrange(50, 70)))     
+                                            shield_level=randrange(50, 70), created_at=timezone.now()))     
             #         planets_to_create.append(PlanetsMultiverse(name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level))
             PlanetsMultiverse.objects.bulk_create(planets_to_create)
 
@@ -57,7 +62,7 @@ class CreatePlanetsMultiverseAPIView(APIView):
 class GetPlanetsMultiverseDataAPIView(APIView):
     def post(self, request):
         try :
-            planets = PlanetsMultiverse.objects.all()
+            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID).all()
             serializer = PlanetsMultiverseSerializer(planets, many=True).data
 
             # for idx, planet in enumerate(serializer):
