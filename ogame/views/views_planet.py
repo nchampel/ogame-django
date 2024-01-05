@@ -6,7 +6,7 @@ from django.utils import timezone
 from environ import Env
 
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
-Planets, PlanetsMultiverse
+Planets, PlanetsMultiverse, Starship
 
 from ogame.serializers import BuildingsSerializer, ResourcesSerializer
 
@@ -110,13 +110,13 @@ class SaveSearchLevelAPIView(APIView):
         try :
             type = request.data['type']
             level = request.data['level']
-            Buildings.objects.filter(user_id=USER_ID).update(**{type: level})
+            Starship.objects.filter(user_id=USER_ID).update(**{type: level})
             # resources_values = {'metal': resource.metal}
 
-            return JsonResponse({'msg': 'Ressources ajoutées'})
+            return JsonResponse({'msg': 'Niveau de recherche sauvegardé'})
         except:
             content = {
-                'msg': 'Erreur lors de l\'ajout des ressources'
+                'msg': 'Erreur lors de la sauvegarde du niveau de recherche'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         

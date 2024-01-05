@@ -5,7 +5,6 @@ class Resources(models.Model):
     metal = models.fields.IntegerField(default=0, blank=True, null=True)
     crystal = models.fields.IntegerField(default=0, blank=True, null=True)
     deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
-    energy = models.fields.IntegerField(default=0, blank=True, null=True)
     satellites = models.fields.IntegerField(default=0, blank=True, null=True)
     user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
@@ -19,9 +18,9 @@ class Buildings(models.Model):
     deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
     energy = models.fields.IntegerField(default=0, blank=True, null=True)
     booster = models.fields.IntegerField(default=1, blank=True, null=True)
-    life_level = models.fields.IntegerField(default=1, blank=True, null=True)
-    fire_level = models.fields.IntegerField(default=1, blank=True, null=True)
-    shield_level = models.fields.IntegerField(default=1, blank=True, null=True)
+    # life_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
     user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
@@ -84,15 +83,25 @@ class PlanetsMultiverse(models.Model):
     class Meta:
         db_table = "planets_multiverse"
 
-class Fight(models.Model):
-    round = models.fields.IntegerField(default=0, blank=True, null=True)
-    life_points_starship = models.fields.IntegerField(default=0, blank=True, null=True)
-    life_points_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
-    fire_starship = models.fields.IntegerField(default=0, blank=True, null=True)
-    fire_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
-    shield_starship = models.fields.IntegerField(default=0, blank=True, null=True)
-    shield_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
-    winner = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+# class Fight(models.Model):
+#     round = models.fields.IntegerField(default=0, blank=True, null=True)
+#     life_points_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+#     life_points_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+#     fire_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+#     fire_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+#     shield_starship = models.fields.IntegerField(default=0, blank=True, null=True)
+#     shield_enemy = models.fields.IntegerField(default=0, blank=True, null=True)
+#     winner = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
 
+#     class Meta:
+#         db_table = "fight"
+
+class Starship(models.Model):
+    is_built = models.fields.BooleanField(default=0, blank=True, null=True)
+    life_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
-        db_table = "fight"
+        db_table = "starship"

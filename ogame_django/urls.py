@@ -26,6 +26,8 @@ from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIVie
 from ogame.views.views_planets_multiverse import GetPlanetsMultiverseDataAPIView, CreatePlanetsMultiverseAPIView,\
 SaveResourcesPlanetsMultiverseAPIView, GetResultsAttackAPIView
 
+from ogame.views.views_starship import GetStarshipDataAPIView, BuildStarshipAPIView, DestroyStarshipAPIView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('resources/get/', GetResourcesAPIView.as_view()),
@@ -42,6 +44,9 @@ urlpatterns = [
     path('planets/multiverse/get/', GetPlanetsMultiverseDataAPIView.as_view()),
     path('planets/multiverse/resources/save/', SaveResourcesPlanetsMultiverseAPIView.as_view()),
     path('planets/multiverse/attack/results/get/', GetResultsAttackAPIView.as_view()),
+    path('starship/get/', GetStarshipDataAPIView.as_view()),
+    path('starship/build/', BuildStarshipAPIView.as_view()),
+    path('starship/destroy/', DestroyStarshipAPIView.as_view()),
 
     path('planets/create/', CreatePlanetsAPIView.as_view()),
     path('planets/multiverse/create/', CreatePlanetsMultiverseAPIView.as_view()),
