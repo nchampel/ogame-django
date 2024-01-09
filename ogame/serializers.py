@@ -12,11 +12,6 @@ class PlanetsMultiverseSerializer(ModelSerializer):
         model = PlanetsMultiverse
         fields = '__all__'
 
-class BuildingsSerializer(ModelSerializer):
-    class Meta:
-        model = Buildings
-        exclude = ['id', 'created_at']
-
 class ResourcesSerializer(ModelSerializer):
     class Meta:
         model = Resources

@@ -17,7 +17,7 @@ class CreatePlanetsMultiverseAPIView(APIView):
     def get(self, request):
         try :
             planets_to_create = []
-            user_id = 2
+            user_id = 3
             for i in range(10):
                 for t in range(50):
                     name = str(i) + '.' + str(t + 1)
@@ -121,6 +121,9 @@ class GetResultsAttackAPIView(APIView):
             winner = ''
             round = 1
             results = []
+            metal = 0
+            crystal = 0
+            deuterium = 0
 
             while winner == '':
                 
@@ -155,7 +158,9 @@ class GetResultsAttackAPIView(APIView):
                     life_enemy = 0
                     winner = 'Player'
                     handleResourcesAttackedPlanet(planet, resources)
-
+                    metal = 0
+                    crystal = 0
+                    deuterium = 0
 
                 if life_starship <= 0:
                     life_starship = 0
@@ -166,7 +171,7 @@ class GetResultsAttackAPIView(APIView):
 
                 results.append({'winner': winner, 'round': round, 'life_points_starship': life_starship, 'life_points_enemy': life_enemy,
                         'shield_starship': shield_starship, 'fire_starship': fire_starship, 'shield_enemy': shield_enemy, 'fire_enemy': fire_enemy,
-                        'exploded': has_exploded})
+                        'exploded': has_exploded, 'metal': metal, 'crystal': crystal, 'deuterium': deuterium})
 
                 round += 1
 

@@ -18,7 +18,7 @@ class CreatePlanetsAPIView(APIView):
     def get(self, request):
         try :
             planets_to_create = []
-            user_id = 2
+            user_id = 3
             for i in range(10):
                 for t in range(10):
                     name = str(i) + '.' + str(t + 1)

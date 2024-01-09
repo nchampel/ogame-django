@@ -8,7 +8,7 @@ from environ import Env
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
 Planets, PlanetsMultiverse, Starship
 
-from ogame.serializers import BuildingsSerializer, ResourcesSerializer
+from ogame.serializers import ResourcesSerializer
 
 env = Env()
 env.read_env()
@@ -48,12 +48,19 @@ class GetBuildingsAPIView(APIView):
     def post(self, request):
         try :
             # courses_id = escape(request.data['courses_id'])
-            building = Buildings.objects.filter(user_id=USER_ID).first()
-            serializer = BuildingsSerializer(building).data
-            return JsonResponse(serializer)
+            buildings = Buildings.objects.filter(user_id=USER_ID)
+           
+            building_levels = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'energy': 0}
+
+            for building in buildings:
+                building_levels[building.building_type] = building.building_level
+            return JsonResponse({'metal': building_levels['metal'],
+                                 'crystal': building_levels['crystal'],
+                                 'deuterium': building_levels['deuterium'],
+                                 'energy': building_levels['energy'],})
         except:
             content = {
-                'msg': 'Erreur lors de la récupération des ressources'
+                'msg': 'Erreur lors de la récupération des niveaux des bâtiments'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         
@@ -95,7 +102,7 @@ class SaveLevelAPIView(APIView):
         try :
             type = request.data['type']
             level = request.data['level']
-            Buildings.objects.filter(user_id=USER_ID).update(**{type: level})
+            Buildings.objects.filter(user_id=USER_ID, building_type=type).update(building_level=level)
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources ajoutées'})
@@ -136,7 +143,7 @@ class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
         try :
             coefficient = request.data['coefficient']
-            Buildings.objects.filter(user_id=USER_ID).update(booster=coefficient)
+            Resources.objects.filter(user_id=USER_ID).update(booster=coefficient)
 
             booster = Boosters.objects.filter(coefficient=coefficient).first()
 
@@ -152,12 +159,13 @@ class ReinitializationAPIView(APIView):
         try :
             user_id = request.data['user_id']
             Buildings.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0, energy=0,
-                                                             booster=1, life_level=0, fire_level=0, shield_level=0, created_at=timezone.now())
-            Resources.objects.filter(user_id=user_id).update(metal=200, crystal=50, deuterium=0,
-                                                             satellites=0, created_at=timezone.now())
+                                                            created_at=timezone.now())
+            Resources.objects.filter(user_id=user_id).update(metal=1000, crystal=1000, deuterium=0,
+                                                             satellites=0, booster=1, created_at=timezone.now())
             Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0)
             PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0,
                                                                      is_discovered=0)
+            Starship.objects.filter(user_id=user_id).update(is_built=0, life_level=0, fire_level=0, shield_level=0)
             
 
             return JsonResponse({'msg': 'Réinitialisation réussie'})
