@@ -66,7 +66,7 @@ class GetPlanetsMultiverseDataAPIView(APIView):
             serializer_all = PlanetsMultiverseSerializer(planets, many=True).data
             shuffle(serializer_all)
             
-            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID, is_discovered=1)
+            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID, is_discovered=1).order_by('updated_at')
             serializer_discovered = PlanetsMultiverseSerializer(planets, many=True).data
             shuffle(serializer_discovered)
             

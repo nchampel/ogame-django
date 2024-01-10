@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.utils import timezone
+from collections import defaultdict
 from environ import Env
 
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
@@ -58,6 +59,15 @@ class GetBuildingsAPIView(APIView):
                                  'crystal': building_levels['crystal'],
                                  'deuterium': building_levels['deuterium'],
                                  'energy': building_levels['energy'],})
+        
+            buildings = Buildings.objects.filter(user_id=USER_ID).values('building_type', 'building_level')
+            
+
+            building_levels = defaultdict(int)
+
+            for building in buildings:
+                building_levels[building['building_type']] = building['building_level']
+            return JsonResponse(building_levels)
         except:
             content = {
                 'msg': 'Erreur lors de la récupération des niveaux des bâtiments'

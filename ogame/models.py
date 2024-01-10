@@ -81,6 +81,7 @@ class PlanetsMultiverse(models.Model):
     shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
     user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     is_discovered = models.fields.BooleanField(default=0, blank=True, null=True)
+    updated_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
 
     class Meta:
