@@ -68,7 +68,7 @@ class GetPlanetsMultiverseDataAPIView(APIView):
             
             planets = PlanetsMultiverse.objects.filter(user_id=USER_ID, is_discovered=1).order_by('updated_at')
             serializer_discovered = PlanetsMultiverseSerializer(planets, many=True).data
-            shuffle(serializer_discovered)
+            # shuffle(serializer_discovered)
             
             planets = PlanetsMultiverse.objects.filter(user_id=USER_ID,  is_discovered=0)
             serializer_not_discovered = PlanetsMultiverseSerializer(planets, many=True).data
@@ -187,7 +187,7 @@ class SaveDiscoveredPlanetAPIView(APIView):
         try :
             planet_id = request.data['planet_id']
 
-            PlanetsMultiverse.objects.filter(id=planet_id).update(is_discovered=1)
+            PlanetsMultiverse.objects.filter(id=planet_id).update(is_discovered=1, updated_at=timezone.now())
 
             return JsonResponse({'msg': 'Découverte de la planète multivers sauvegardée'})
         except:
