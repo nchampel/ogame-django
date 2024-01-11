@@ -19,7 +19,7 @@ from django.urls import path
 
 from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
 GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
-ReinitializationAPIView, SaveSearchLevelAPIView
+ReinitializationAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -27,6 +27,8 @@ from ogame.views.views_planets_multiverse import GetPlanetsMultiverseDataAPIView
 SaveResourcesPlanetsMultiverseAPIView, GetResultsAttackAPIView, SaveDiscoveredPlanetAPIView
 
 from ogame.views.views_starship import GetStarshipDataAPIView, BuildStarshipAPIView, DestroyStarshipAPIView
+
+from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -49,6 +51,7 @@ urlpatterns = [
     path('starship/get/', GetStarshipDataAPIView.as_view()),
     path('starship/build/', BuildStarshipAPIView.as_view()),
     path('starship/destroy/', DestroyStarshipAPIView.as_view()),
+    path('search/levels/get/', GetSearchLevelsAPIView.as_view()),
 
     path('planets/create/', CreatePlanetsAPIView.as_view()),
     path('planets/multiverse/create/', CreatePlanetsMultiverseAPIView.as_view()),

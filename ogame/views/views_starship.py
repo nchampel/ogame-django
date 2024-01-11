@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from environ import Env
 
-from ogame.models import Starship, Resources
+from ogame.models import Starship, Resources, Searches
 
 from ogame.serializers import StarshipSerializer
 
@@ -32,8 +32,15 @@ class BuildStarshipAPIView(APIView):
         try :
             # on récupère les données pour les ressources nécessaires à la construction du vaisseau
             starship = Starship.objects.filter(user_id=USER_ID).first()
-            resources_needed = {'metal': 1000000 * starship.life_level, 'crystal': 1000000 * starship.fire_level,
-                                'deuterium': 1000000 * starship.shield_level}
+            searches = Searches.objects.filter(user_id=USER_ID)
+
+            search_levels = {'life': 0, 'fire': 0, 'shield': 0}
+
+            for search in searches:
+                search_levels[search.search_type] = search.search_level
+
+            resources_needed = {'metal': 1000000 * search_levels['life'], 'crystal': 1000000 * search_levels['fire'],
+                                'deuterium': 1000000 * search_levels['shield']}
             resources = Resources.objects.filter(user_id=USER_ID).first()
 
             if not starship.is_built and resources_needed['metal'] <= resources.metal and resources_needed['crystal'] <= resources.crystal and resources_needed['deuterium'] <= resources.deuterium:

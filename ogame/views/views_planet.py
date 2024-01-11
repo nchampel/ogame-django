@@ -122,21 +122,6 @@ class SaveLevelAPIView(APIView):
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         
-class SaveSearchLevelAPIView(APIView):
-    def post(self, request):
-        try :
-            type = request.data['type']
-            level = request.data['level']
-            Starship.objects.filter(user_id=USER_ID).update(**{type: level})
-            # resources_values = {'metal': resource.metal}
-
-            return JsonResponse({'msg': 'Niveau de recherche sauvegardé'})
-        except:
-            content = {
-                'msg': 'Erreur lors de la sauvegarde du niveau de recherche'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        
 class GetBoosterCostAPIView(APIView):
     def post(self, request):
         try :

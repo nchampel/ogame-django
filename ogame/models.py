@@ -102,11 +102,23 @@ class PlanetsMultiverse(models.Model):
 
 class Starship(models.Model):
     is_built = models.fields.BooleanField(default=0, blank=True, null=True)
-    life_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # life_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
     fight_exp = models.fields.IntegerField(default=0, blank=True, null=True)
     user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "starship"
+
+class Searches(models.Model):
+    # users = models.ForeignKey(Users, on_delete=models.CASCADE)
+    search_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+    search_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    metal = models.fields.IntegerField(default=0, blank=True, null=True)
+    crystal = models.fields.IntegerField(default=0, blank=True, null=True)
+    deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
+    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    created_at = models.fields.DateTimeField(max_length=0)
+    class Meta:
+        db_table = "searches"
