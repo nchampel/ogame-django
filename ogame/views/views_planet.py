@@ -15,6 +15,20 @@ env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
 
+class SalutAPIView(APIView):
+    def get(self, request):
+        try :
+            # courses_id = escape(request.data['courses_id'])
+            # resource = Resources.objects.filter(user_id=USER_ID).first()
+            # serializer = ResourcesSerializer(resource).data
+
+            return JsonResponse({'msg': 'Hourra !!!!!!!!!'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la récupération des ressources'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
 class GetResourcesAPIView(APIView):
     def post(self, request):
         try :
@@ -153,14 +167,14 @@ class ReinitializationAPIView(APIView):
     def post(self, request):
         try :
             user_id = request.data['user_id']
-            Buildings.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0, energy=0,
+            Buildings.objects.filter(user_id=user_id).update(building_level=0,
                                                             created_at=timezone.now())
             Resources.objects.filter(user_id=user_id).update(metal=1000, crystal=1000, deuterium=0,
                                                              satellites=0, booster=1, created_at=timezone.now())
             Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0)
             PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0,
                                                                      is_discovered=0)
-            Starship.objects.filter(user_id=user_id).update(is_built=0, life_level=0, fire_level=0, shield_level=0)
+            Starship.objects.filter(user_id=user_id).update(is_built=0, fight_exp=0)
             
 
             return JsonResponse({'msg': 'Réinitialisation réussie'})

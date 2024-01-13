@@ -14,7 +14,7 @@ USER_ID = int(env("USER_ID"))
         
 class GetSearchLevelsAPIView(APIView):
     def post(self, request):
-        # try :
+        try :
             
             searches = Searches.objects.filter(user_id=USER_ID)
 
@@ -31,7 +31,7 @@ class GetSearchLevelsAPIView(APIView):
                                                      'metal': search.metal,
                                                      'crystal': search.crystal,
                                                      'deuterium': search.deuterium}
-            print(search_levels)
+            # print(search_levels)
             return JsonResponse(search_levels)
                 
 
@@ -41,11 +41,11 @@ class GetSearchLevelsAPIView(APIView):
 
             
             return JsonResponse(search_levels)
-        # except:
-        #     content = {
-        #         'msg': 'Erreur lors de la récupération des niveaux de la recherche'
-        #     }
-        #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            content = {
+                'msg': 'Erreur lors de la récupération des niveaux de la recherche'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         
 class SaveSearchLevelAPIView(APIView):
     def post(self, request):

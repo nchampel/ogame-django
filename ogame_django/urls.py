@@ -19,7 +19,7 @@ from django.urls import path
 
 from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
 GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
-ReinitializationAPIView
+ReinitializationAPIView, SalutAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -32,6 +32,9 @@ from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIV
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('salut/', SalutAPIView.as_view()),
+
     path('resources/get/', GetResourcesAPIView.as_view()),
     path('buildings/get/', GetBuildingsAPIView.as_view()),
     # pas utilisé
