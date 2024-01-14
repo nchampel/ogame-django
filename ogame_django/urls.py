@@ -30,6 +30,9 @@ from ogame.views.views_starship import GetStarshipDataAPIView, BuildStarshipAPIV
 
 from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIView
 
+from ogame.views.views_users import RegisterAPIView, LoginAPIView, ReinitializeAttemptsAPIView,\
+VerifyJWTAPIView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -59,5 +62,9 @@ urlpatterns = [
     path('planets/create/', CreatePlanetsAPIView.as_view()),
     path('planets/multiverse/create/', CreatePlanetsMultiverseAPIView.as_view()),
     path('reinitialization/', ReinitializationAPIView.as_view()),
+    path('subscribe/', RegisterAPIView.as_view()),
+    path('login/', LoginAPIView.as_view()),
+    path('attempts/reinitialize/', ReinitializeAttemptsAPIView.as_view()),
+    path('jwt/verify/', VerifyJWTAPIView.as_view()),
 
 ]

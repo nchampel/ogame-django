@@ -1,4 +1,22 @@
 from django.db import models
+from django.utils import timezone
+
+class Users(models.Model):
+    pseudo = models.fields.CharField(max_length=50, blank=True, null=False)
+    email = models.fields.EmailField(max_length=100, blank=True, null=False)
+    password = models.fields.CharField(max_length=100, blank=True, null=False)
+    attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
+    created_at = models.fields.DateTimeField(max_length=0)
+    last_login = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
+    class Meta:
+        db_table = "users"
+
+class Token(models.Model):
+    token = models.fields.TextField()
+    user_id = models.fields.IntegerField()
+    created_at = models.fields.DateTimeField(default=timezone.now, blank=True, null=True, max_length=0)
+    class Meta:
+        db_table = "token"
 
 class Resources(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)

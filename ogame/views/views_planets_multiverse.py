@@ -10,6 +10,8 @@ from ogame.models import PlanetsMultiverse, Resources, Starship
 
 from ogame.serializers import PlanetsMultiverseSerializer
 
+from ogame.functions import handleResourcesAttackedPlanet
+
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
@@ -98,14 +100,6 @@ class SaveResourcesPlanetsMultiverseAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde des ressources des planètes multivers'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-def handleResourcesAttackedPlanet(planet, resources):
-    resources['metal'] += planet['metal']
-    resources['crystal'] += planet['crystal']
-    resources['deuterium'] += planet['deuterium']
-    Resources.objects.filter(id=USER_ID).update(metal=resources['metal'],
-                        crystal=resources['crystal'], deuterium=resources['deuterium'])
-    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=0, crystal=0, deuterium=0)
 class GetResultsAttackAPIView(APIView):
     def post(self, request):
         try :
