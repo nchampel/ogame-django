@@ -9,12 +9,15 @@ from ogame.models import Starship, Resources, Searches
 
 from ogame.serializers import StarshipSerializer
 
+from ogame.functions import authenticate
+
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
 
 class GetStarshipDataAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
             starship = Starship.objects.filter(user_id=USER_ID).first()
@@ -29,6 +32,7 @@ class GetStarshipDataAPIView(APIView):
         
 class BuildStarshipAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             # on récupère les données pour les ressources nécessaires à la construction du vaisseau
             starship = Starship.objects.filter(user_id=USER_ID).first()
@@ -60,6 +64,7 @@ class BuildStarshipAPIView(APIView):
         
 class DestroyStarshipAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             Starship.objects.filter(user_id=USER_ID).update(is_built=0)
 

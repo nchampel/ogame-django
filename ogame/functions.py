@@ -9,13 +9,20 @@ from ogame.models import Token, Resources, PlanetsMultiverse
 env = Env()
 env.read_env()
 SECRET_KEY = env("SECRET_KEY")
-USER_ID = env("USER_ID")
 
-def authenticate(self, request):
-        if not "user_id" in request.data:
-            raise AuthenticationFailed('Pas d\'id renseigné !')
+def authenticate(request):
+        
+        jwt_token = request.headers.get('Authorization', None)
 
-        user_id = escape(request.data['user_id'])
+        if not jwt_token:
+            raise AuthenticationFailed('Pas de jwt token !')
+
+        token = jwt_token[7:]
+
+        # if not "user_id" in request.data:
+        #     raise AuthenticationFailed('Pas d\'id renseigné !')
+
+        # user_id = escape(request.data['user_id'])
         jwt_token = request.headers.get('authorization', None)
 
         if not jwt_token:
@@ -26,9 +33,9 @@ def authenticate(self, request):
 
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-            user_id_jwt = payload['id']
-            if int(user_id) != int(user_id_jwt):
-                raise AuthenticationFailed('Ids différents !')
+            user_id = payload['id']
+            # if int(user_id) != int(user_id_jwt):
+            #     raise AuthenticationFailed('Ids différents !')
             isTokenInDB = False
             tokensInDB = Token.objects.filter(user_id=user_id)
             for tokenInDB in tokensInDB:
@@ -42,10 +49,19 @@ def authenticate(self, request):
         except (jwt.DecodeError, jwt.InvalidTokenError):
             raise AuthenticationFailed('JWT non valide !')
         
-def handleResourcesAttackedPlanet(planet, resources):
-    resources['metal'] += planet['metal']
-    resources['crystal'] += planet['crystal']
-    resources['deuterium'] += planet['deuterium']
-    Resources.objects.filter(id=USER_ID).update(metal=resources['metal'],
-                        crystal=resources['crystal'], deuterium=resources['deuterium'])
-    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=0, crystal=0, deuterium=0)
+def handleResourcesAttackedPlanet(planet, resources, user_id):
+    # print(resources)
+    # à tester
+    for key, _ in resources.items():
+        # print(key, value)
+        resources[key] += round(planet[key] / 2)
+        Resources.objects.filter(user_id=user_id, resource_type=key).update(resource_value=resources[key])
+
+    # resources['metal'] += planet['metal']
+    # resources['crystal'] += planet['crystal']
+    # resources['deuterium'] += planet['deuterium']
+    # Resources.objects.filter(id=user_id).update(metal=resources['metal'],
+    #                     crystal=resources['crystal'], deuterium=resources['deuterium'])
+    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=round(planet['metal'] / 2), 
+                                                             crystal=round(planet['crystal'] / 2), 
+                                                             deuterium=round(planet['deuterium'] / 2))

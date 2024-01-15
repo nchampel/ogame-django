@@ -20,11 +20,14 @@ class Token(models.Model):
 
 class Resources(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
-    metal = models.fields.BigIntegerField(default=0, blank=True, null=True)
-    crystal = models.fields.BigIntegerField(default=0, blank=True, null=True)
-    deuterium = models.fields.BigIntegerField(default=0, blank=True, null=True)
-    satellites = models.fields.IntegerField(default=0, blank=True, null=True)
-    booster = models.fields.IntegerField(default=1, blank=True, null=True)
+    # metal = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    # crystal = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    # deuterium = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    # satellites = models.fields.IntegerField(default=0, blank=True, null=True)
+    # booster = models.fields.IntegerField(default=1, blank=True, null=True)
+    resource_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+    resource_value = models.fields.IntegerField(default=0, blank=True, null=True)
+    
     user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:

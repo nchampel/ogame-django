@@ -11,6 +11,8 @@ Planets, PlanetsMultiverse, Starship
 
 from ogame.serializers import ResourcesSerializer
 
+from ogame.functions import authenticate
+
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
@@ -31,9 +33,21 @@ class SalutAPIView(APIView):
 
 class GetResourcesAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
-            resource = Resources.objects.filter(user_id=USER_ID).first()
+            resources = Resources.objects.filter(user_id=USER_ID)
+
+            resources_values = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'satellites': 0, 'booster': 0}
+
+            for resource in resources:
+                resources_values[resource.resource_type] = resource.resource_value
+            return JsonResponse({'metal': resources_values['metal'],
+                                 'crystal': resources_values['crystal'],
+                                 'deuterium': resources_values['deuterium'],
+                                 'satellites': resources_values['satellites'],
+                                 'booster': resources_values['booster'],
+                                 })
             serializer = ResourcesSerializer(resource).data
 
             return JsonResponse(serializer)
@@ -45,11 +59,16 @@ class GetResourcesAPIView(APIView):
         
 class SaveResourcesAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
-            resources = request.data['resources']
-            resource = Resources.objects.filter(user_id=USER_ID).update(metal=resources['metal'],
-                                        crystal=resources['crystal'], deuterium=resources['deuterium'],
-                                        satellites=resources['satellites'])
+            resources = request.data
+            # print(resources)
+            for key, value in resources.items():
+                # print(key, value)
+                Resources.objects.filter(user_id=USER_ID, resource_type=key).update(resource_value=value)
+            # Resources.objects.filter(user_id=USER_ID).update(metal=resources['metal'],
+            #                             crystal=resources['crystal'], deuterium=resources['deuterium'],
+            #                             satellites=resources['satellites'])
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources sauvegardées'})
@@ -61,6 +80,7 @@ class SaveResourcesAPIView(APIView):
 
 class GetBuildingsAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
             buildings = Buildings.objects.filter(user_id=USER_ID)
@@ -91,6 +111,7 @@ class GetBuildingsAPIView(APIView):
 # pas utilisé
 class GetBuildingsResourcesAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
             types = ['metal', 'crystal', 'deuterium', 'energy']
@@ -123,6 +144,7 @@ class GetBuildingsResourcesAPIView(APIView):
         
 class SaveLevelAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             type = request.data['type']
             level = request.data['level']
@@ -138,6 +160,7 @@ class SaveLevelAPIView(APIView):
         
 class GetBoosterCostAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             coefficient = request.data['coefficient']
             cost = Boosters.objects.filter(coefficient=coefficient).first().cost
@@ -150,9 +173,10 @@ class GetBoosterCostAPIView(APIView):
 
 class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             coefficient = request.data['coefficient']
-            Resources.objects.filter(user_id=USER_ID).update(booster=coefficient)
+            Resources.objects.filter(user_id=USER_ID, resource_type='booster').update(resource_value=coefficient)
 
             booster = Boosters.objects.filter(coefficient=coefficient).first()
 
@@ -165,12 +189,17 @@ class SaveBoosterCoefficientAPIView(APIView):
         
 class ReinitializationAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             user_id = request.data['user_id']
             Buildings.objects.filter(user_id=user_id).update(building_level=0,
                                                             created_at=timezone.now())
-            Resources.objects.filter(user_id=user_id).update(metal=1000, crystal=1000, deuterium=0,
-                                                             satellites=0, booster=1, created_at=timezone.now())
+            # à tester
+            resources_start = {'metal': 1000, 'crystal': 1000, 'deuterium': 0,
+                               'satellites': 0, 'booster': 1}
+            for key, value in resources_start.items():
+
+                Resources.objects.filter(user_id=user_id, resource_type=key).update(resource_value=value, created_at=timezone.now())
             Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0)
             PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0,
                                                                      is_discovered=0)

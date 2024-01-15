@@ -7,6 +7,8 @@ from environ import Env
 
 from ogame.models import Searches
 
+from ogame.functions import authenticate
+
 
 env = Env()
 env.read_env()
@@ -14,6 +16,7 @@ USER_ID = int(env("USER_ID"))
         
 class GetSearchLevelsAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             
             searches = Searches.objects.filter(user_id=USER_ID)
@@ -49,6 +52,7 @@ class GetSearchLevelsAPIView(APIView):
         
 class SaveSearchLevelAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             type = request.data['type']
             level = request.data['level']

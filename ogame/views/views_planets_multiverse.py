@@ -10,13 +10,14 @@ from ogame.models import PlanetsMultiverse, Resources, Starship
 
 from ogame.serializers import PlanetsMultiverseSerializer
 
-from ogame.functions import handleResourcesAttackedPlanet
+from ogame.functions import handleResourcesAttackedPlanet, authenticate
 
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
 class CreatePlanetsMultiverseAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
+        authenticate(request)
         try :
             planets_to_create = []
             user_id = 3
@@ -52,7 +53,6 @@ class CreatePlanetsMultiverseAPIView(APIView):
             #         planets_to_create.append(PlanetsMultiverse(name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level))
             PlanetsMultiverse.objects.bulk_create(planets_to_create)
 
-            # booster = Boosters.objects.filter(coefficient=coefficient).first()
 
             return JsonResponse({'coefficient': 'ok'})
         except:
@@ -63,6 +63,7 @@ class CreatePlanetsMultiverseAPIView(APIView):
         
 class GetPlanetsMultiverseDataAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             planets = PlanetsMultiverse.objects.filter(user_id=USER_ID).all()
             serializer_all = PlanetsMultiverseSerializer(planets, many=True).data
@@ -86,6 +87,7 @@ class GetPlanetsMultiverseDataAPIView(APIView):
         
 class SaveResourcesPlanetsMultiverseAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             planets = request.data['planets']
             for planet in planets:
@@ -102,6 +104,7 @@ class SaveResourcesPlanetsMultiverseAPIView(APIView):
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 class GetResultsAttackAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             planet = request.data['planet']
             starship_levels = request.data['starshipLevels']
@@ -178,6 +181,7 @@ class GetResultsAttackAPIView(APIView):
         
 class SaveDiscoveredPlanetAPIView(APIView):
     def post(self, request):
+        authenticate(request)
         try :
             planet_id = request.data['planet_id']
 
@@ -192,6 +196,7 @@ class SaveDiscoveredPlanetAPIView(APIView):
         
 # class GetResourcesAttackAPIView(APIView):
 #     def post(self, request):
+#         authenticate(request)
 #         try :
 #             planet = request.data['planet']
 #             resources = request.data['resources']
