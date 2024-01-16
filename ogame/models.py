@@ -6,6 +6,7 @@ class Users(models.Model):
     email = models.fields.EmailField(max_length=100, blank=True, null=False)
     password = models.fields.CharField(max_length=100, blank=True, null=False)
     attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
+    nature = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     last_login = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
     class Meta:
@@ -27,8 +28,9 @@ class Resources(models.Model):
     # booster = models.fields.IntegerField(default=1, blank=True, null=True)
     resource_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
     resource_value = models.fields.IntegerField(default=0, blank=True, null=True)
-    
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    harvestable = models.fields.BooleanField(default=0, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.CASCADE)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "resources"
@@ -45,7 +47,8 @@ class Buildings(models.Model):
     # life_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.CASCADE)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "buildings"
@@ -80,7 +83,8 @@ class Planets(models.Model):
     metal_level = models.fields.IntegerField(default=0, blank=True, null=True)
     crystal_level = models.fields.IntegerField(default=0, blank=True, null=True)
     deuterium_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.CASCADE)
     created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
 
     class Meta:
@@ -100,7 +104,8 @@ class PlanetsMultiverse(models.Model):
     life_level = models.fields.IntegerField(default=0, blank=True, null=True)
     fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
     shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     is_discovered = models.fields.BooleanField(default=0, blank=True, null=True)
     updated_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
@@ -126,8 +131,11 @@ class Starship(models.Model):
     # life_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # shield_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    # search_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+    # search_level = models.fields.IntegerField(default=0, blank=True, null=True)
     fight_exp = models.fields.IntegerField(default=0, blank=True, null=True)
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.CASCADE)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "starship"
@@ -139,7 +147,8 @@ class Searches(models.Model):
     metal = models.fields.IntegerField(default=0, blank=True, null=True)
     crystal = models.fields.IntegerField(default=0, blank=True, null=True)
     deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
-    user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.CASCADE)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "searches"
