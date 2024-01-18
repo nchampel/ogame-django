@@ -2,8 +2,10 @@ from rest_framework.exceptions import AuthenticationFailed, APIException
 import jwt
 from environ import Env
 from django.utils.html import escape
+from django.db.models import Case, When, Value, IntegerField, F
+from typing import Dict
 
-from ogame.models import Token, Resources, PlanetsMultiverse
+from ogame.models import Token, Resources, PlanetsMultiverse, Users
 
 # Get JWT secret key
 env = Env()
@@ -65,3 +67,20 @@ def handleResourcesAttackedPlanet(planet, resources, user_id):
     PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=round(planet['metal'] / 2), 
                                                              crystal=round(planet['crystal'] / 2), 
                                                              deuterium=round(planet['deuterium'] / 2))
+    
+def saveResources(user: Users, resources: Dict[str, int]):
+    types = ['metal', 'crystal', 'deuterium']
+    
+    updates = []
+
+    for resource in resources:
+        for r_type in types:
+            if r_type in resource:
+                valeur_ressource = resource[r_type]
+                update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
+                updates.append(update_condition)
+
+    # Appliquer la mise à jour en une seule requête
+    Resources.objects.filter(users=user.id).update(
+        resource_value=Case(*updates, default=F('resource_value'), output_field=IntegerField())
+    )

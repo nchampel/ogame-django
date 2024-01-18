@@ -33,6 +33,8 @@ from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIV
 from ogame.views.views_users import RegisterAPIView, LoginAPIView, ReinitializeAttemptsAPIView,\
 VerifyJWTAPIView
 
+from ogame.views.views_cron import CronAddResourcesAPIView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -66,5 +68,7 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view()),
     path('attempts/reinitialize/', ReinitializeAttemptsAPIView.as_view()),
     path('jwt/verify/', VerifyJWTAPIView.as_view()),
+    
+    path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
 
 ]
