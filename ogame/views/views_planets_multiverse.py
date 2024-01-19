@@ -109,6 +109,7 @@ class GetResultsAttackAPIView(APIView):
             planet = request.data['planet']
             starship_levels = request.data['starshipLevels']
             resources = request.data['resources']
+            user_id = request.data['user_id']
             
             # results = [{'winner': '', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
             #             'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10},
@@ -154,7 +155,7 @@ class GetResultsAttackAPIView(APIView):
                 if life_enemy <= 0:
                     life_enemy = 0
                     winner = 'Player'
-                    handleResourcesAttackedPlanet(planet, resources)
+                    handleResourcesAttackedPlanet(planet, resources, user_id)
                     metal = 0
                     crystal = 0
                     deuterium = 0

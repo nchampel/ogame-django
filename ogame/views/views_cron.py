@@ -10,7 +10,7 @@ from environ import Env
 
 from ogame.models import Resources, Planets, PlanetsMultiverse, Users, Buildings
 
-# from ogame.functions import saveResources
+from ogame.functions import saveResourcesPlayer, saveResourcesPlanets, saveResourcesPlanetsMultiverse
 
 env = Env()
 env.read_env()
@@ -20,7 +20,6 @@ class CronAddResourcesAPIView(APIView):
     def get(self, request):
             key = escape(request.GET['key'])
             if key == CRON_KEY:
-                resources_to_update = []
                 types = ['metal', 'crystal', 'deuterium']
                 users = Users.objects.all()
                 for user in users:
@@ -30,8 +29,6 @@ class CronAddResourcesAPIView(APIView):
                     for resource in resources_player:
                         if 'booster' in resource:
                             booster = resource['booster']
-                    # if user.id == 1:
-                    #     print(resources_player)
                     buildings = Buildings.objects.filter(users=user).values_list('building_type', 'building_level')
                     buildings_player = {bp[0]: bp[1] for bp in buildings}
                     for resource in resources_player:
@@ -42,22 +39,56 @@ class CronAddResourcesAPIView(APIView):
                         if 'deuterium' in resource:
                             resource['deuterium'] += 0 + 8 * booster * round(10 * buildings_player['deuterium'] * 1.1 ** buildings_player['deuterium'] / 60)
                     
-                    for resource_player in resources_player:
-                        for r_type in types:
-                            resource_type, _ = resource_player
-                            if r_type == resource_type:
-                                    valeur_ressource = resource_player[r_type]
-                                    update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
-
-                                    # Créer une instance mise à jour pour chaque utilisateur
-                                    updated_instance = Resources(
-                                        id=resource_player['id'],
-                                        resource_value=Case(update_condition, default=F('resource_value'), output_field=IntegerField())
-                                    ) 
-                        resources_to_update.append(updated_instance)
+                resources_to_update = saveResourcesPlayer(types, resources_player)
 
                 Resources.objects.bulk_update(resources_to_update, ['resource_value'], batch_size=len(resources_to_update))
+                
                 # partie planets
+                planets = Planets.objects.all()
+                types_planet = [('metal', 'metal_level'), ('crystal', 'crystal_level'), ('deuterium', 'deuterium_level')]
+                for planet in planets:
+                    
+                    for tp in types_planet:
+                        type, level = tp
+                        resource_planet_type = getattr(planet, type)
+                        level_planet_type = getattr(planet, level)
+                        if type == 'metal':
+                            resource_planet_type += round(30 * level_planet_type * 1.1 ** level_planet_type / 60)
+                        if type == 'crystal':
+                            resource_planet_type += round(20 * level_planet_type * 1.1 ** level_planet_type / 60)
+                        if type == 'deuterium':
+                            resource_planet_type += round(10 * level_planet_type * 1.1 ** level_planet_type / 60)
+                        setattr(planet, type, resource_planet_type) 
+                for type in types:
+                    resources_planets = [{'metal': rp.metal, 'crystal': rp.crystal, 'deuterium': rp.deuterium, 'id': rp.id} for rp in planets]
+
+                resources_planets_to_update = saveResourcesPlanets(resources_planets)
+
+                Planets.objects.bulk_update(resources_planets_to_update, ['metal', 'crystal', 'deuterium'], batch_size=len(resources_planets_to_update))
+                
+
                 # partie planets multiverse
+                planets_multiverse = PlanetsMultiverse.objects.all()
+                types_planet_multiverse = [('metal', 'metal_level'), ('crystal', 'crystal_level'), ('deuterium', 'deuterium_level')]
+                for planet_multiverse in planets_multiverse:
+                    
+                    for tpm in types_planet_multiverse:
+                        type, level = tpm
+                        resource_planet_multiverse_type = getattr(planet_multiverse, type)
+                        level_planet_multiverse_type = getattr(planet_multiverse, level)
+                        if type == 'metal':
+                            resource_planet_multiverse_type += round(30 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
+                        if type == 'crystal':
+                            resource_planet_multiverse_type += round(20 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
+                        if type == 'deuterium':
+                            resource_planet_multiverse_type += round(10 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
+                        setattr(planet_multiverse, type, resource_planet_multiverse_type) 
+                for type in types:
+                    resources_planets_multiverse = [{'metal': rpm.metal, 'crystal': rpm.crystal, 'deuterium': rpm.deuterium, 'id': rpm.id} for rpm in planets_multiverse]
+
+                resources_planets_multiverse_to_update = saveResourcesPlanetsMultiverse(resources_planets_multiverse)
+
+                PlanetsMultiverse.objects.bulk_update(resources_planets_multiverse_to_update, ['metal', 'crystal', 'deuterium'], batch_size=len(resources_planets_multiverse_to_update))
+                
                           
             return JsonResponse({'msg': 'Ressources ajoutées'})

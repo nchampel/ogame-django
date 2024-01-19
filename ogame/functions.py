@@ -3,9 +3,9 @@ import jwt
 from environ import Env
 from django.utils.html import escape
 from django.db.models import Case, When, Value, IntegerField, F
-from typing import Dict
+from typing import Dict, List
 
-from ogame.models import Token, Resources, PlanetsMultiverse, Users
+from ogame.models import Token, Resources, PlanetsMultiverse, Planets
 
 # Get JWT secret key
 env = Env()
@@ -51,9 +51,9 @@ def authenticate(request):
         except (jwt.DecodeError, jwt.InvalidTokenError):
             raise AuthenticationFailed('JWT non valide !')
         
-def handleResourcesAttackedPlanet(planet, resources, user_id):
+def handleResourcesAttackedPlanet(planet: Dict[str, int], resources: Dict[str, int], user_id: int):
     # print(resources)
-    # à tester
+    # à tester, vérifier le typage
     for key, _ in resources.items():
         # print(key, value)
         resources[key] += round(planet[key] / 2)
@@ -68,38 +68,54 @@ def handleResourcesAttackedPlanet(planet, resources, user_id):
                                                              crystal=round(planet['crystal'] / 2), 
                                                              deuterium=round(planet['deuterium'] / 2))
     
-# def saveResources(user: Users, resources: Dict[str, int]):
-#     # types = ['metal', 'crystal', 'deuterium']
+def saveResourcesPlayer(types: List[str], resources_player: Dict[str, int]):
+
+    resources_to_update = []
     
-#     # updates = []
+    for resource_player in resources_player:
+            # print(resource_player)
+            for r_type in types:
+                resource_type, _ = resource_player
+                if r_type == resource_type:
+                        valeur_ressource = resource_player[r_type]
+                        update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
 
-#     # for resource in resources:
-#     #     for r_type in types:
-#     #         if r_type in resource:
-#     #             valeur_ressource = resource[r_type]
-#     #             update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
-#     #             updates.append(update_condition)
+                        # Créer une instance mise à jour pour chaque utilisateur
+                        updated_instance = Resources(
+                            id=resource_player['id'],
+                            resource_value=Case(update_condition, default=F('resource_value'), output_field=IntegerField())
+                        ) 
+            resources_to_update.append(updated_instance)
 
-#     # # Appliquer la mise à jour en une seule requête
-#     # Resources.objects.filter(users=user.id).update(
-#     #     resource_value=Case(*updates, default=F('resource_value'), output_field=IntegerField())
-#     # )
-#     updates = []
-#     types = ['metal', 'crystal', 'deuterium']
+    return resources_to_update
+
+def saveResourcesPlanets(resources_planet: Dict[str, int]):
+
+    resources_to_update = []
     
-#     for resource in resources:
-#         for r_type in types:
-#             if r_type in resource:
-#                 valeur_ressource = resource[r_type]
-#                 update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
-#                 updates.append(update_condition)
+    for resource_planet in resources_planet:
+        resource_planet_without_id = resource_planet.copy()
+        del resource_planet_without_id['id']
+        updated_instance = Planets(
+            id=resource_planet['id'],
+            **{key: value for key, value in resource_planet_without_id.items()}
+        ) 
+        resources_to_update.append(updated_instance)
 
-#     # Créer une instance mise à jour pour chaque utilisateur
-#     updated_instance = Resources(
-#         users=user,
-#         resource_value=Case(*updates, default=F('resource_value'), output_field=IntegerField())
-#     )
+    return resources_to_update
 
-#     # Ajouter l'instance mise à jour à la liste
-#     updates_to_return = [updated_instance]
-#     return updates_to_return
+def saveResourcesPlanetsMultiverse(resources_planet: Dict[str, int]):
+
+    resources_to_update = []
+    
+    for resource_planet in resources_planet:
+        resource_planet_without_id = resource_planet.copy()
+        del resource_planet_without_id['id']
+        updated_instance = PlanetsMultiverse(
+            id=resource_planet['id'],
+            **{key: value for key, value in resource_planet_without_id.items()}
+        ) 
+        resources_to_update.append(updated_instance)
+
+    return resources_to_update
+                
