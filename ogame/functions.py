@@ -45,6 +45,7 @@ def authenticate(request):
                     isTokenInDB = True
             if not isTokenInDB:
                 raise AuthenticationFailed('Token absent de la BDD !')
+            return user_id
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Jeton expiré !')
             # raise MyCustomExceptionCode401('Jeton expiré !')

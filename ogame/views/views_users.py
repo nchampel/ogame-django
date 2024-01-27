@@ -8,8 +8,9 @@ from django.utils.html import escape
 from rest_framework.exceptions import AuthenticationFailed
 from environ import Env
 import jwt, datetime as dt
+import base64
 
-from ogame.models import Users, Token
+from ogame.models import Users, Token, Buildings, Resources, Searches, Starship
 
 env = Env()
 env.read_env()
@@ -22,21 +23,57 @@ class RegisterAPIView(APIView):
         email = escape(request.data['values']['email'])
         password = escape(request.data['values']['password'])
 
+        user_in_db = Users.objects.filter(pseudo=pseudo).first()
+        if user_in_db:
+            return JsonResponse({'msg': 'Pseudo déjà utilisé'})
+
     # on encrypte le mot de passe
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
         password_hashed = hashed.decode('utf-8')
+        # password = b"super secret password"
+        # password_hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
-        # data = {
-        #     'pseudo': pseudo,
-        #     'email': email,
-        #     'password': password_hashed,
-        # }
         try:
             Users.objects.create(pseudo=pseudo, email=email, password=password_hashed, 
-                                 created_at=timezone.now())
+                                    created_at=timezone.now())
+            user = Users.objects.latest('id')
+            buildings = ['metal', 'crystal', 'deuterium', 'energy']
+            buildings_to_insert = []
+            for building in buildings:
+                buildings_to_insert.append(Buildings(building_type=building, building_level=0, users_id=user.id, created_at=timezone.now()))
+            Buildings.objects.bulk_create(buildings_to_insert)
+            resources = ['metal', 'crystal', 'deuterium', 'booster', 'satellites']
+            resources_to_insert = []
+            for resource in resources:
+                value = 0
+                if resource == 'metal':
+                    value = 1000
+                if resource == 'crystal':
+                    value = 1000
+                if resource == 'booster':
+                    value = 1
+                resources_to_insert.append(Resources(resource_type=resource, resource_value=value, users_id=user.id, created_at=timezone.now()))
+            Resources.objects.bulk_create(resources_to_insert)
+            searches = ['life', 'fire', 'shield']
+            searches_to_insert = []
+            for search in searches:
+                metal_value = 0
+                crystal_value = 0
+                deuterium_value = 0
+                if search == 'fire':
+                    crystal_value = 50
+                if search == 'life':
+                    metal_value = 100
+                if search == 'shield':
+                    deuterium_value = 20
+                searches_to_insert.append(Searches(search_type=search, search_level=0, users_id=user.id, 
+                                                    metal=metal_value, crystal=crystal_value,
+                                                    deuterium=deuterium_value, created_at=timezone.now()))
+            Searches.objects.bulk_create(searches_to_insert)
+            Starship.objects.create(is_built=0, fight_exp=0, users_id=user.id, created_at=timezone.now())
             
-            return Response('Enregistré')
+            return JsonResponse({'msg': 'Enregistré'})
         except:
             content = {
                 'msg': 'Erreur lors de la création de l\'utilisateur'
@@ -59,6 +96,8 @@ class LoginAPIView(APIView):
                 if user.attempts_connection <= 3:    
                     # vérifier la correspondance des mdp
                     pass_bytes = password.encode('utf-8')
+                    # print(base64.b64encode(pass_bytes).decode('utf-8'))
+                    
 
                     password_checked = bcrypt.checkpw(pass_bytes, user.password.encode('utf-8'))
                     if not password_checked:
@@ -75,7 +114,7 @@ class LoginAPIView(APIView):
                     # sauvegarder le token en bdd
                     Token.objects.create(user_id=user.id, token=token, created_at=timezone.now())
 
-                    Users.objects.filter(pseudo=pseudo).update(last_login=timezone.now(), attempts_connection=user.attempts_connection + 1)
+                    Users.objects.filter(pseudo=pseudo).update(last_login=timezone.now())
 
                     reponseJWT = Response()
 
@@ -110,7 +149,7 @@ class ReinitializeAttemptsAPIView(APIView):
 class VerifyJWTAPIView(APIView):
     def post(self, request):
         token = request.data['jwt']
-        print(token)
+        # print(token)
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:

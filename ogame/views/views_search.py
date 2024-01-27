@@ -16,10 +16,10 @@ USER_ID = int(env("USER_ID"))
         
 class GetSearchLevelsAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             
-            searches = Searches.objects.filter(user_id=USER_ID)
+            searches = Searches.objects.filter(users_id=user_id)
 
             search_levels = {'life': 0, 'fire': 0, 'shield': 0, }
 
@@ -52,11 +52,11 @@ class GetSearchLevelsAPIView(APIView):
         
 class SaveSearchLevelAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             type = request.data['type']
             level = request.data['level']
-            Searches.objects.filter(user_id=USER_ID, search_type=type).update(search_level=level)
+            Searches.objects.filter(users_id=user_id, search_type=type).update(search_level=level)
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Niveau de recherche sauvegardé'})

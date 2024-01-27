@@ -20,10 +20,6 @@ USER_ID = int(env("USER_ID"))
 class SalutAPIView(APIView):
     def get(self, request):
         try :
-            # courses_id = escape(request.data['courses_id'])
-            # resource = Resources.objects.filter(user_id=USER_ID).first()
-            # serializer = ResourcesSerializer(resource).data
-
             return JsonResponse({'msg': 'Hourra !!!!!!!!!'})
         except:
             content = {
@@ -33,12 +29,12 @@ class SalutAPIView(APIView):
 
 class GetResourcesAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
-            resources = Resources.objects.filter(user_id=USER_ID)
+            resources = Resources.objects.filter(users_id=user_id)
 
-            resources_values = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'satellites': 0, 'booster': 0}
+            resources_values = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'satellites': 0, 'booster': 1}
 
             for resource in resources:
                 resources_values[resource.resource_type] = resource.resource_value
@@ -59,14 +55,14 @@ class GetResourcesAPIView(APIView):
         
 class SaveResourcesAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             resources = request.data
             # print(resources)
             for key, value in resources.items():
                 # print(key, value)
-                Resources.objects.filter(user_id=USER_ID, resource_type=key).update(resource_value=value)
-            # Resources.objects.filter(user_id=USER_ID).update(metal=resources['metal'],
+                Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value)
+            # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
             #                             crystal=resources['crystal'], deuterium=resources['deuterium'],
             #                             satellites=resources['satellites'])
             # resources_values = {'metal': resource.metal}
@@ -80,21 +76,21 @@ class SaveResourcesAPIView(APIView):
 
 class GetBuildingsAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
-            buildings = Buildings.objects.filter(user_id=USER_ID)
-           
+            buildings = Buildings.objects.filter(users_id=user_id)
+            
             building_levels = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'energy': 0}
 
             for building in buildings:
                 building_levels[building.building_type] = building.building_level
             return JsonResponse({'metal': building_levels['metal'],
-                                 'crystal': building_levels['crystal'],
-                                 'deuterium': building_levels['deuterium'],
-                                 'energy': building_levels['energy'],})
+                                    'crystal': building_levels['crystal'],
+                                    'deuterium': building_levels['deuterium'],
+                                    'energy': building_levels['energy'],})
         
-            buildings = Buildings.objects.filter(user_id=USER_ID).values('building_type', 'building_level')
+            buildings = Buildings.objects.filter(users_id=user_id).values('building_type', 'building_level')
             
 
             building_levels = defaultdict(int)
@@ -111,7 +107,7 @@ class GetBuildingsAPIView(APIView):
 # pas utilisé
 class GetBuildingsResourcesAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
             types = ['metal', 'crystal', 'deuterium', 'energy']
@@ -144,11 +140,11 @@ class GetBuildingsResourcesAPIView(APIView):
         
 class SaveLevelAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             type = request.data['type']
             level = request.data['level']
-            Buildings.objects.filter(user_id=USER_ID, building_type=type).update(building_level=level)
+            Buildings.objects.filter(users_id=user_id, building_type=type).update(building_level=level)
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources ajoutées'})
@@ -160,7 +156,7 @@ class SaveLevelAPIView(APIView):
         
 class GetBoosterCostAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             coefficient = request.data['coefficient']
             cost = Boosters.objects.filter(coefficient=coefficient).first().cost
@@ -173,10 +169,10 @@ class GetBoosterCostAPIView(APIView):
 
 class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             coefficient = request.data['coefficient']
-            Resources.objects.filter(user_id=USER_ID, resource_type='booster').update(resource_value=coefficient)
+            Resources.objects.filter(users_id=user_id, resource_type='booster').update(resource_value=coefficient)
 
             booster = Boosters.objects.filter(coefficient=coefficient).first()
 
@@ -189,7 +185,7 @@ class SaveBoosterCoefficientAPIView(APIView):
         
 class ReinitializationAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             user_id = request.data['user_id']
             Buildings.objects.filter(user_id=user_id).update(building_level=0,

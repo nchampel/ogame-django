@@ -1,14 +1,35 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractBaseUser
 
-class Users(models.Model):
-    pseudo = models.fields.CharField(max_length=50, blank=True, null=False)
+
+# from users.managers import CustomUserManager
+
+# class Users(models.Model):
+#     pseudo = models.fields.CharField(max_length=50, blank=True, null=False)
+#     email = models.fields.EmailField(max_length=100, blank=True, null=False)
+#     password = models.fields.CharField(max_length=100, blank=True, null=False)
+#     attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
+#     nature = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
+#     created_at = models.fields.DateTimeField(max_length=0)
+#     last_login = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
+#     class Meta:
+#         db_table = "users"
+
+class Users(AbstractBaseUser):
+    password = models.fields.CharField(max_length=255, default=None, blank=True, null=True)
+    pseudo = models.fields.CharField(max_length=50, blank=True, null=False, unique=True)
     email = models.fields.EmailField(max_length=100, blank=True, null=False)
-    password = models.fields.CharField(max_length=100, blank=True, null=False)
     attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
     nature = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
-    last_login = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
+    username = None
+
+    USERNAME_FIELD = 'pseudo'
+    REQUIRED_FIELDS = []
+
+    # test enregistrement user en BDD
+    # objects = CustomUserManager()
     class Meta:
         db_table = "users"
 

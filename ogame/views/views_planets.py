@@ -18,7 +18,7 @@ USER_ID = int(env("USER_ID"))
 
 class CreatePlanetsAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             planets_to_create = []
             user_id = 3
@@ -43,9 +43,9 @@ class CreatePlanetsAPIView(APIView):
         
 class GetPlanetsDataAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
-            planets = Planets.objects.filter(user_id=USER_ID).all()
+            planets = Planets.objects.filter(users_id=user_id).all()
             serializer = PlanetsSerializer(planets, many=True).data
 
             for idx, planet in enumerate(serializer):
@@ -61,7 +61,7 @@ class GetPlanetsDataAPIView(APIView):
         
 class SaveResourcesPlanetsAPIView(APIView):
     def post(self, request):
-        authenticate(request)
+        user_id = authenticate(request)
         try :
             planets = request.data['planets']
             for planet in planets:

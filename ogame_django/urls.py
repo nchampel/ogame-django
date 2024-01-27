@@ -35,6 +35,8 @@ VerifyJWTAPIView
 
 from ogame.views.views_cron import CronAddResourcesAPIView
 
+from ogame.views.views_test import testAPIView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -70,5 +72,7 @@ urlpatterns = [
     path('jwt/verify/', VerifyJWTAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
+
+    path('test/', testAPIView.as_view()),
 
 ]
