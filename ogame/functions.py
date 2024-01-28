@@ -72,21 +72,33 @@ def handleResourcesAttackedPlanet(planet: Dict[str, int], resources: Dict[str, i
 def saveResourcesPlayer(types: List[str], resources_player: Dict[str, int]):
 
     resources_to_update = []
-    
+    # print('resources_player', resources_player)
     for resource_player in resources_player:
-            # print(resource_player)
+            # print('resource_player', resource_player)
             for r_type in types:
                 resource_type, _ = resource_player
+                # print('tz', resource_player[updated].replace(tzinfo=None, microsecond=0))
+                # print('tzt', resource_player[updated])
+                # print('tzs', (timezone.now().replace(tzinfo=None, microsecond=0).replace(tzinfo=None, microsecond=0)).total_seconds())
+                # print('up', (resource_player[updated].replace(tzinfo=None, microsecond=0)).total_seconds())
+                # print('seconds', (timezone.now().replace(tzinfo=None, microsecond=0) - resource_player[updated].replace(tzinfo=None, microsecond=0)).total_seconds())
+                # print((timezone.now() - resource_player[updated]).total_seconds() > 60.0 )
+                # print('resource_type', resource_type)
+                updated_instance = None
                 if r_type == resource_type:
+                        # print('rtype')
                         valeur_ressource = resource_player[r_type]
                         update_condition = When(resource_type=r_type, then=Value(valeur_ressource))
 
                         # Créer une instance mise à jour pour chaque utilisateur
                         updated_instance = Resources(
                             id=resource_player['id'],
-                            resource_value=Case(update_condition, default=F('resource_value'), output_field=IntegerField())
-                        ) 
-            resources_to_update.append(updated_instance)
+                            resource_value=Case(update_condition, default=F('resource_value'), output_field=IntegerField(),
+                            # updated_at=timezone.now()
+                            )
+                        )
+                if updated_instance is not None: 
+                    resources_to_update.append(updated_instance)
 
     return resources_to_update
 
