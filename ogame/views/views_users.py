@@ -8,9 +8,11 @@ from django.utils.html import escape
 from rest_framework.exceptions import AuthenticationFailed
 from environ import Env
 import jwt, datetime as dt
-import base64
+from typing import Dict
 
-from ogame.models import Users, Token, Buildings, Resources, Searches, Starship
+from ogame.models import Users, Token, Buildings, Resources, Searches, Starship, Logs
+
+from ogame.functions import authenticate
 
 env = Env()
 env.read_env()
@@ -107,6 +109,7 @@ class LoginAPIView(APIView):
                     payload = {
                         'id': user.id,
                         'pseudo': pseudo,
+                        # 'nature': user.nature,
                         'exp': dt.datetime.utcnow() + dt.timedelta(days=30),
                         'iat': dt.datetime.utcnow()
                     }
@@ -120,7 +123,8 @@ class LoginAPIView(APIView):
 
                     reponseJWT.data = {
                         'jwt': token,
-                        'authenticated': True
+                        'authenticated': True,
+                        'nature': user.nature
                     }
                     return reponseJWT
                 else:
@@ -153,10 +157,13 @@ class VerifyJWTAPIView(APIView):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
+            return JsonResponse({'msg': 'Jeton expiré'})
             return Response('Jeton expiré')
         except:
+            return JsonResponse({'msg': "Pas de token"})
             return Response("Pas de token")
         user_id_jwt = payload['id']
+        user = Users.objects.filter(id=user_id_jwt).first()
 
         
         try:
@@ -164,12 +171,76 @@ class VerifyJWTAPIView(APIView):
             # token = Token.objects.filter(user_id=1, token=token).first()
 
             if token:
-            
+                return JsonResponse({'msg': 'Authentifié', 'nature': user.nature})
                 return Response('Authentifié')
             else:
+                return JsonResponse({'msg': 'Pas authentifié', 'nature': None})
                 return Response('Pas authentifié')
         except:
             content = {
                 'msg': 'Erreur lors de la vérification de l\'authentification de l\'utilisateur'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class DetermineNatureAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        values = request.data['values']
+        
+        try:
+            user = Users.objects.filter(id=user_id).first()
+        
+            sotoc_score = 0
+            flumia_score = 0
+            sora_score = 0
+            nano_score = 0
+            altheron_score = 0
+            description = "Le joueur " + user.pseudo + " a répondu "
+            for key, value in values.items():
+                if value == 'rb' or value == 'rm':
+                    sotoc_score += 1
+                if value == 'eb' or value == 'em':
+                    flumia_score += 1
+                if value == 'ob' or value == 'om':
+                    sora_score += 1
+                if value == 'ab' or value == 'am':
+                    nano_score += 1
+                if value == 'sb' or value == 'sm':
+                    altheron_score += 1
+                description += key + ' : ' + value + ', '
+            description = description[:-2]
+            # sauvegarder le log des réponses données
+            Logs.objects.create(type='joueur', category='alignement', users=user, description=description, target=user.id, created_at=timezone.now())
+
+            score = [{'sotoc': sotoc_score}, {'flumia': flumia_score}, {'sora': sora_score}, 
+                    {'nano': nano_score}, {'altheron': altheron_score}]
+
+            # Trouver la valeur maximale
+            value_max = max(dict[list(dict.keys())[0]] for dict in score)
+
+            # Récupérer tous les dictionnaires avec la valeur maximale
+            bgz_max = [dict for dict in score if dict[list(dict.keys())[0]] == value_max]
+
+            if len(bgz_max) == 1:
+                Users.objects.filter(id=user_id).update(nature=list(bgz_max[0].keys())[0])
+                return JsonResponse({'bgz': list(bgz_max[0].keys())[0]})
+            else:
+                return JsonResponse({'bgz': bgz_max})
+        except:
+            content = {
+                'msg': 'Erreur lors de la détermination de l\'alignement BGZ'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+class SaveNatureAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        try:
+            values = request.data['values']
+            Users.objects.filter(id=user_id).update(nature=values['choice'])
+            return JsonResponse({'msg': 'alignement sauvegardé'})
+            
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde de l\'alignement BGZ'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)

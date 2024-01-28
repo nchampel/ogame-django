@@ -31,7 +31,7 @@ from ogame.views.views_starship import GetStarshipDataAPIView, BuildStarshipAPIV
 from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIView
 
 from ogame.views.views_users import RegisterAPIView, LoginAPIView, ReinitializeAttemptsAPIView,\
-VerifyJWTAPIView
+VerifyJWTAPIView, DetermineNatureAPIView, SaveNatureAPIView
 
 from ogame.views.views_cron import CronAddResourcesAPIView
 
@@ -70,6 +70,8 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view()),
     path('attempts/reinitialize/', ReinitializeAttemptsAPIView.as_view()),
     path('jwt/verify/', VerifyJWTAPIView.as_view()),
+    path('nature/determine/', DetermineNatureAPIView.as_view()),
+    path('nature/save/', SaveNatureAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
 

@@ -56,23 +56,23 @@ class GetResourcesAPIView(APIView):
 class SaveResourcesAPIView(APIView):
     def post(self, request):
         user_id = authenticate(request)
-        try :
-            resources = request.data
-            # print(resources)
-            for key, value in resources.items():
-                # print(key, value)
-                Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value)
-            # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
-            #                             crystal=resources['crystal'], deuterium=resources['deuterium'],
-            #                             satellites=resources['satellites'])
-            # resources_values = {'metal': resource.metal}
+        # try :
+        resources = request.data['resources']
+        print(resources)
+        for key, value in resources.items():
+            # print(key, value)
+            Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
+        # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
+        #                             crystal=resources['crystal'], deuterium=resources['deuterium'],
+        #                             satellites=resources['satellites'])
+        # resources_values = {'metal': resource.metal}
 
-            return JsonResponse({'msg': 'Ressources sauvegardées'})
-        except:
-            content = {
-                'msg': 'Erreur lors de la sauvegarde des ressources'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'msg': 'Ressources sauvegardées'})
+        # except:
+        #     content = {
+        #         'msg': 'Erreur lors de la sauvegarde des ressources'
+        #     }
+        #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class GetBuildingsAPIView(APIView):
     def post(self, request):

@@ -52,6 +52,8 @@ class Resources(models.Model):
     harvestable = models.fields.BooleanField(default=0, blank=True, null=True)
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    updated_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
+    harvested_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "resources"
@@ -107,6 +109,7 @@ class Planets(models.Model):
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE,default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
+    updated_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
 
     class Meta:
         db_table = "planets"
@@ -173,3 +176,13 @@ class Searches(models.Model):
     created_at = models.fields.DateTimeField(max_length=0)
     class Meta:
         db_table = "searches"
+
+class Logs(models.Model):
+    description = models.fields.TextField(default=None, blank=True, null=True)
+    target = models.fields.IntegerField(default=None, blank=True, null=True)
+    users = models.ForeignKey(Users, on_delete=models.RESTRICT, default=None, blank=True, null=True)
+    type = models.fields.CharField(max_length=50)
+    category = models.fields.CharField(max_length=50)
+    created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
+    class Meta:
+        db_table = "logs"
