@@ -48,7 +48,7 @@ class Resources(models.Model):
     # satellites = models.fields.IntegerField(default=0, blank=True, null=True)
     # booster = models.fields.IntegerField(default=1, blank=True, null=True)
     resource_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
-    resource_value = models.fields.IntegerField(default=0, blank=True, null=True)
+    resource_value = models.fields.BigIntegerField(default=0, blank=True, null=True)
     harvestable = models.fields.BooleanField(default=0, blank=True, null=True)
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE, default=None, blank=True, null=True)
@@ -92,7 +92,7 @@ class BuildingsResources(models.Model):
 class Boosters(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     coefficient = models.fields.IntegerField(default=0, blank=True, null=True)
-    cost = models.fields.IntegerField(default=0, blank=True, null=True)
+    cost = models.fields.BigIntegerField(default=0, blank=True, null=True)
 
     class Meta:
         db_table = "boosters"
@@ -168,9 +168,9 @@ class Searches(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     search_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
     search_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    metal = models.fields.IntegerField(default=0, blank=True, null=True)
-    crystal = models.fields.IntegerField(default=0, blank=True, null=True)
-    deuterium = models.fields.IntegerField(default=0, blank=True, null=True)
+    metal = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    crystal = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    deuterium = models.fields.BigIntegerField(default=0, blank=True, null=True)
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE,default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)

@@ -25,41 +25,41 @@ class CronAddResourcesAPIView(APIView):
                 users = Users.objects.all()
                 resources_to_update_players = []
                 for user in users:
-                    
-                    resources = Resources.objects.filter(users=user).values_list('resource_type', 'resource_value', 'id', 'updated_at')
-                    resources_player = [{rp[0]: rp[1], 'id': rp[2]} for rp in resources]
-                    updated_at = resources[0][3]
-                    # print('updtaed', dt.fromisoformat(updated_at))
+                    if user.nature is not None:
+                        resources = Resources.objects.filter(users=user).values_list('resource_type', 'resource_value', 'id', 'updated_at')
+                        resources_player = [{rp[0]: rp[1], 'id': rp[2]} for rp in resources]
+                        updated_at = resources[0][3]
+                        # print('updtaed', dt.fromisoformat(updated_at))
 
-                    # print('updtaed', updated_at)
-                    # print('tz', timezone.now())
+                        # print('updtaed', updated_at)
+                        # print('tz', timezone.now())
 
-                    # timezone.activate('Europe/Paris')
+                        # timezone.activate('Europe/Paris')
 
-                    # Obtient l'heure locale actuelle
-                    # local_time = timezone.localtime(timezone.now())
-                    # print('lt', local_time)
-                    # print((timezone.now() - updated_at).total_seconds())
-                    # print((local_time - updated_at).total_seconds() > 60.0)
-                    if (timezone.now() - updated_at).total_seconds() >= 60.0:
-                        for resource in resources_player:
-                            # print('resource', resource)
-                            if 'booster' in resource:
-                                booster = resource['booster']
-                        buildings = Buildings.objects.filter(users=user).values_list('building_type', 'building_level')
-                        buildings_player = {bp[0]: bp[1] for bp in buildings}
-                        for resource in resources_player:
-                            if 'metal' in resource:
-                                resource['metal'] += 2 + 8 * booster * round(30 * buildings_player['metal'] * 1.1 ** buildings_player['metal'] / 60)
-                            if 'crystal' in resource:
-                                resource['crystal'] += 1 + 8 * booster * round(20 * buildings_player['crystal'] * 1.1 ** buildings_player['crystal'] / 60)
-                            if 'deuterium' in resource:
-                                resource['deuterium'] += 0 + 8 * booster * round(10 * buildings_player['deuterium'] * 1.1 ** buildings_player['deuterium'] / 60)
-                        
-                        resources_to_update = saveResourcesPlayer(types, resources_player)
-                        # print('resources_to_update', resources_to_update)
-                        for rtu in resources_to_update:
-                            resources_to_update_players.append(rtu)
+                        # Obtient l'heure locale actuelle
+                        # local_time = timezone.localtime(timezone.now())
+                        # print('lt', local_time)
+                        # print((timezone.now() - updated_at).total_seconds())
+                        # print((local_time - updated_at).total_seconds() > 60.0)
+                        if updated_at is not None and (timezone.now() - updated_at).total_seconds() >= 60.0:
+                            for resource in resources_player:
+                                # print('resource', resource)
+                                if 'booster' in resource:
+                                    booster = resource['booster']
+                            buildings = Buildings.objects.filter(users=user).values_list('building_type', 'building_level')
+                            buildings_player = {bp[0]: bp[1] for bp in buildings}
+                            for resource in resources_player:
+                                if 'metal' in resource:
+                                    resource['metal'] += 12 + 8 * booster * round(30 * buildings_player['metal'] * 1.1 ** buildings_player['metal'] / 60)
+                                if 'crystal' in resource:
+                                    resource['crystal'] += 6 + 8 * booster * round(20 * buildings_player['crystal'] * 1.1 ** buildings_player['crystal'] / 60)
+                                if 'deuterium' in resource:
+                                    resource['deuterium'] += 0 + 8 * booster * round(10 * buildings_player['deuterium'] * 1.1 ** buildings_player['deuterium'] / 60)
+                            
+                            resources_to_update = saveResourcesPlayer(types, resources_player)
+                            # print('resources_to_update', resources_to_update)
+                            for rtu in resources_to_update:
+                                resources_to_update_players.append(rtu)
                 print('resources_to_update_players', resources_to_update_players)
                 if len(resources_to_update_players) > 0:
                     Resources.objects.bulk_update(resources_to_update_players, ['resource_value'], batch_size=len(resources_to_update_players))
