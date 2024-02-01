@@ -10,12 +10,15 @@ from ogame.models import Planets
 
 from ogame.serializers import PlanetsSerializer
 
+from ogame.functions import authenticate
+
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
 
 class CreatePlanetsAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
+        user_id = authenticate(request)
         try :
             planets_to_create = []
             user_id = 3
@@ -31,9 +34,7 @@ class CreatePlanetsAPIView(APIView):
                     planets_to_create.append(Planets(user_id=user_id, name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level, created_at=timezone.now()))
             Planets.objects.bulk_create(planets_to_create)
 
-            # booster = Boosters.objects.filter(coefficient=coefficient).first()
-
-            return JsonResponse({'coefficient': 'ok'})
+            return JsonResponse({'msg': 'Planètes créées'})
         except:
             content = {
                 'msg': 'Erreur lors de la création des planètes'
@@ -42,8 +43,9 @@ class CreatePlanetsAPIView(APIView):
         
 class GetPlanetsDataAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
-            planets = Planets.objects.filter(user_id=USER_ID).all()
+            planets = Planets.objects.filter(users_id=user_id).all()
             serializer = PlanetsSerializer(planets, many=True).data
 
             for idx, planet in enumerate(serializer):
@@ -59,6 +61,7 @@ class GetPlanetsDataAPIView(APIView):
         
 class SaveResourcesPlanetsAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
             planets = request.data['planets']
             for planet in planets:

@@ -10,11 +10,14 @@ from ogame.models import PlanetsMultiverse, Resources, Starship
 
 from ogame.serializers import PlanetsMultiverseSerializer
 
+from ogame.functions import handleResourcesAttackedPlanet, authenticate
+
 env = Env()
 env.read_env()
 USER_ID = int(env("USER_ID"))
 class CreatePlanetsMultiverseAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
+        user_id = authenticate(request)
         try :
             planets_to_create = []
             user_id = 3
@@ -50,7 +53,6 @@ class CreatePlanetsMultiverseAPIView(APIView):
             #         planets_to_create.append(PlanetsMultiverse(name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level))
             PlanetsMultiverse.objects.bulk_create(planets_to_create)
 
-            # booster = Boosters.objects.filter(coefficient=coefficient).first()
 
             return JsonResponse({'coefficient': 'ok'})
         except:
@@ -61,16 +63,17 @@ class CreatePlanetsMultiverseAPIView(APIView):
         
 class GetPlanetsMultiverseDataAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
-            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID).all()
+            planets = PlanetsMultiverse.objects.filter(users_id=user_id).all()
             serializer_all = PlanetsMultiverseSerializer(planets, many=True).data
             shuffle(serializer_all)
             
-            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID, is_discovered=1).order_by('updated_at')
+            planets = PlanetsMultiverse.objects.filter(users_id=user_id, is_discovered=1).order_by('updated_at')
             serializer_discovered = PlanetsMultiverseSerializer(planets, many=True).data
             # shuffle(serializer_discovered)
             
-            planets = PlanetsMultiverse.objects.filter(user_id=USER_ID,  is_discovered=0)
+            planets = PlanetsMultiverse.objects.filter(users_id=user_id,  is_discovered=0)
             serializer_not_discovered = PlanetsMultiverseSerializer(planets, many=True).data
             shuffle(serializer_not_discovered)
 
@@ -84,6 +87,7 @@ class GetPlanetsMultiverseDataAPIView(APIView):
         
 class SaveResourcesPlanetsMultiverseAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
             planets = request.data['planets']
             for planet in planets:
@@ -98,20 +102,14 @@ class SaveResourcesPlanetsMultiverseAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde des ressources des planètes multivers'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-def handleResourcesAttackedPlanet(planet, resources):
-    resources['metal'] += planet['metal']
-    resources['crystal'] += planet['crystal']
-    resources['deuterium'] += planet['deuterium']
-    Resources.objects.filter(id=USER_ID).update(metal=resources['metal'],
-                        crystal=resources['crystal'], deuterium=resources['deuterium'])
-    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=0, crystal=0, deuterium=0)
 class GetResultsAttackAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
             planet = request.data['planet']
             starship_levels = request.data['starshipLevels']
             resources = request.data['resources']
+            user_id = request.data['user_id']
             
             # results = [{'winner': '', 'round': 1, 'life_points_starship': 10, 'life_points_enemy': 10,
             #             'shield_starship': 10, 'fire_starship': 10, 'shield_enemy': 10, 'fire_enemy': 10},
@@ -157,7 +155,7 @@ class GetResultsAttackAPIView(APIView):
                 if life_enemy <= 0:
                     life_enemy = 0
                     winner = 'Player'
-                    handleResourcesAttackedPlanet(planet, resources)
+                    handleResourcesAttackedPlanet(planet, resources, user_id)
                     metal = 0
                     crystal = 0
                     deuterium = 0
@@ -166,7 +164,7 @@ class GetResultsAttackAPIView(APIView):
                     life_starship = 0
                     winner = 'Enemy'
                     # détruire le vaisseau
-                    Starship.objects.filter(id=USER_ID).update(is_built=0)
+                    Starship.objects.filter(users_id=user_id).update(is_built=0)
                     
 
                 results.append({'winner': winner, 'round': round, 'life_points_starship': life_starship, 'life_points_enemy': life_enemy,
@@ -184,6 +182,7 @@ class GetResultsAttackAPIView(APIView):
         
 class SaveDiscoveredPlanetAPIView(APIView):
     def post(self, request):
+        user_id = authenticate(request)
         try :
             planet_id = request.data['planet_id']
 
@@ -198,6 +197,7 @@ class SaveDiscoveredPlanetAPIView(APIView):
         
 # class GetResourcesAttackAPIView(APIView):
 #     def post(self, request):
+#          user_id = authenticate(request)
 #         try :
 #             planet = request.data['planet']
 #             resources = request.data['resources']
