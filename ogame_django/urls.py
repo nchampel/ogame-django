@@ -35,6 +35,8 @@ VerifyJWTAPIView, DetermineNatureAPIView, SaveNatureAPIView
 
 from ogame.views.views_cron import CronAddResourcesAPIView
 
+from ogame.views.views_ranking import GetRankingAPIView
+
 from ogame.views.views_test import testAPIView
 
 urlpatterns = [
@@ -72,6 +74,7 @@ urlpatterns = [
     path('jwt/verify/', VerifyJWTAPIView.as_view()),
     path('nature/determine/', DetermineNatureAPIView.as_view()),
     path('nature/save/', SaveNatureAPIView.as_view()),
+    path('ranking/get/', GetRankingAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
 
