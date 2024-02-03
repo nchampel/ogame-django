@@ -24,7 +24,7 @@ class GetSearchLevelsAPIView(APIView):
             search_levels = {'life': 0, 'fire': 0, 'shield': 0, }
 
             for search in searches:
-                resources_needed = {'metal': 0, 'crystal': 0, 'deuterium': 0}
+                resources_needed = {'metal': 0, 'crystal': 0, 'tritium': 0}
 
                 for resource in resources_needed:
                     # print(resource)
@@ -33,14 +33,14 @@ class GetSearchLevelsAPIView(APIView):
                 search_levels[search.search_type] = {'level': search.search_level, 
                                                      'metal': search.metal,
                                                      'crystal': search.crystal,
-                                                     'deuterium': search.deuterium}
+                                                     'tritium': search.tritium}
             # print(search_levels)
             return JsonResponse(search_levels)
                 
 
             search_levels = {'life_level': search_levels['life'], 'fire_level': search_levels['fire'],
                                 'shield_level': search_levels['shield'], 'metal': search_levels['metal'],
-                                'crystal': search_levels['crystal'], 'deuterium': search_levels['deuterium']}
+                                'crystal': search_levels['crystal'], 'tritium': search_levels['tritium']}
 
             
             return JsonResponse(search_levels)

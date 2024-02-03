@@ -26,7 +26,7 @@ class CreatePlanetsMultiverseAPIView(APIView):
                     name = str(i) + '.' + str(t + 1)
                     metal_level = randrange(40, 100)
                     crystal_level = randrange(40, 90)
-                    deuterium_level = randrange(40, 80)
+                    tritium_level = randrange(40, 80)
                     has_headquarter = randrange(0, 2)
                     type = 'ressources' if has_headquarter == 0 else 'ennemi'
 
@@ -35,22 +35,22 @@ class CreatePlanetsMultiverseAPIView(APIView):
                     if has_headquarter == 0:
                         planets_to_create.append(
                             PlanetsMultiverse(user_id=user_id, name=name, metal_level=metal_level, type=type,
-                                            crystal_level=crystal_level, deuterium_level=deuterium_level,
+                                            crystal_level=crystal_level, tritium_level=tritium_level,
                                             has_headquarter=has_headquarter, created_at=timezone.now()))
                     else:
                         planets_to_create.append(
                             PlanetsMultiverse(user_id=user_id, name=name, metal_level=metal_level, type=type,
-                                            crystal_level=crystal_level, deuterium_level=deuterium_level,
+                                            crystal_level=crystal_level, tritium_level=tritium_level,
                                             has_headquarter=has_headquarter,
                                             life_level=randrange(1, 50), fire_level=randrange(1, 50),
                                             shield_level=randrange(1, 50), created_at=timezone.now()))
             # création du boss
             planets_to_create.append(PlanetsMultiverse(user_id=user_id, name=str(randrange(0, 10)) + '.' + str(randrange(0, 51)), type='boss',
-                                            crystal_level=randrange(80, 250), deuterium_level=randrange(80, 250),
+                                            crystal_level=randrange(80, 250), tritium_level=randrange(80, 250),
                                             has_headquarter=1, metal_level=randrange(80, 250), 
                                             life_level=randrange(50, 70), fire_level=randrange(50, 70),
                                             shield_level=randrange(50, 70), created_at=timezone.now()))     
-            #         planets_to_create.append(PlanetsMultiverse(name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level))
+            #         planets_to_create.append(PlanetsMultiverse(name=name, metal_level=metal_level, crystal_level=crystal_level, tritium_level=tritium_level))
             PlanetsMultiverse.objects.bulk_create(planets_to_create)
 
 
@@ -93,7 +93,7 @@ class SaveResourcesPlanetsMultiverseAPIView(APIView):
             for planet in planets:
 
                 PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=planet['metal'],
-                                        crystal=planet['crystal'], deuterium=planet['deuterium'])
+                                        crystal=planet['crystal'], tritium=planet['tritium'])
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources des planètes multivers sauvegardées'})
@@ -121,7 +121,7 @@ class GetResultsAttackAPIView(APIView):
             results = []
             metal = 0
             crystal = 0
-            deuterium = 0
+            tritium = 0
 
             while winner == '':
                 
@@ -158,7 +158,7 @@ class GetResultsAttackAPIView(APIView):
                     handleResourcesAttackedPlanet(planet, resources, user_id)
                     metal = 0
                     crystal = 0
-                    deuterium = 0
+                    tritium = 0
 
                 if life_starship <= 0:
                     life_starship = 0
@@ -169,7 +169,7 @@ class GetResultsAttackAPIView(APIView):
 
                 results.append({'winner': winner, 'round': round, 'life_points_starship': life_starship, 'life_points_enemy': life_enemy,
                         'shield_starship': shield_starship, 'fire_starship': fire_starship, 'shield_enemy': shield_enemy, 'fire_enemy': fire_enemy,
-                        'exploded': has_exploded, 'metal': metal, 'crystal': crystal, 'deuterium': deuterium})
+                        'exploded': has_exploded, 'metal': metal, 'crystal': crystal, 'tritium': tritium})
 
                 round += 1
 

@@ -44,16 +44,16 @@ class BuildStarshipAPIView(APIView):
                 search_levels[search.search_type] = search.search_level
 
             resources_needed = {'metal': 1000000 * search_levels['life'], 'crystal': 1000000 * search_levels['fire'],
-                                'deuterium': 1000000 * search_levels['shield']}
+                                'tritium': 1000000 * search_levels['shield']}
             resources = Resources.objects.filter(users_id=user_id).first()
 
-            if not starship.is_built and resources_needed['metal'] <= resources.metal and resources_needed['crystal'] <= resources.crystal and resources_needed['deuterium'] <= resources.deuterium:
+            if not starship.is_built and resources_needed['metal'] <= resources.metal and resources_needed['crystal'] <= resources.crystal and resources_needed['tritium'] <= resources.tritium:
                 Starship.objects.filter(users_id=user_id).update(is_built=1)
                 remaining_metal = resources.metal - resources_needed['metal']
                 remaining_crystal = resources.crystal - resources_needed['crystal']
-                remaining_deuterium = resources.deuterium - resources_needed['deuterium']
+                remaining_tritium = resources.tritium - resources_needed['tritium']
                 Resources.objects.filter(users_id=user_id).update(metal=remaining_metal,
-                                        crystal=remaining_crystal, deuterium=remaining_deuterium)
+                                        crystal=remaining_crystal, tritium=remaining_tritium)
 
             return JsonResponse({'msg': 'Vaisseau construit'})
         except:

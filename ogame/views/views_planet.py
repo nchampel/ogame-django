@@ -34,13 +34,13 @@ class GetResourcesAPIView(APIView):
             # courses_id = escape(request.data['courses_id'])
             resources = Resources.objects.filter(users_id=user_id)
 
-            resources_values = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'satellites': 0, 'booster': 1}
+            resources_values = {'metal': 0, 'crystal': 0, 'tritium': 0, 'satellites': 0, 'booster': 1}
 
             for resource in resources:
                 resources_values[resource.resource_type] = resource.resource_value
             return JsonResponse({'metal': resources_values['metal'],
                                  'crystal': resources_values['crystal'],
-                                 'deuterium': resources_values['deuterium'],
+                                 'tritium': resources_values['tritium'],
                                  'satellites': resources_values['satellites'],
                                  'booster': resources_values['booster'],
                                  })
@@ -63,7 +63,7 @@ class SaveResourcesAPIView(APIView):
             # print(key, value)
             Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
         # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
-        #                             crystal=resources['crystal'], deuterium=resources['deuterium'],
+        #                             crystal=resources['crystal'], tritium=resources['tritium'],
         #                             satellites=resources['satellites'])
         # resources_values = {'metal': resource.metal}
 
@@ -81,13 +81,13 @@ class GetBuildingsAPIView(APIView):
             # courses_id = escape(request.data['courses_id'])
             buildings = Buildings.objects.filter(users_id=user_id)
             
-            building_levels = {'metal': 0, 'crystal': 0, 'deuterium': 0, 'energy': 0}
+            building_levels = {'metal': 0, 'crystal': 0, 'tritium': 0, 'energy': 0}
 
             for building in buildings:
                 building_levels[building.building_type] = building.building_level
             return JsonResponse({'metal': building_levels['metal'],
                                     'crystal': building_levels['crystal'],
-                                    'deuterium': building_levels['deuterium'],
+                                    'tritium': building_levels['tritium'],
                                     'energy': building_levels['energy'],})
         
             buildings = Buildings.objects.filter(users_id=user_id).values('building_type', 'building_level')
@@ -110,7 +110,7 @@ class GetBuildingsResourcesAPIView(APIView):
         user_id = authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
-            types = ['metal', 'crystal', 'deuterium', 'energy']
+            types = ['metal', 'crystal', 'tritium', 'energy']
 
             # Obtenez toutes les valeurs des ressources pour les types spécifiés en une seule requête
             buildings_resources_values = BuildingsResources.objects.filter(type__in=types)
@@ -126,7 +126,7 @@ class GetBuildingsResourcesAPIView(APIView):
                 # Ajoutez la valeur à la liste résultante
                 buildings_resources_values_all.append({t: {'metal': building_resources_values.metal,
                                 'crystal': building_resources_values.crystal,
-                                'deuterium': building_resources_values.deuterium,
+                                'tritium': building_resources_values.tritium,
                                 'energy': building_resources_values.energy,
                                 'resource_to_add': building_resources_values.resource_to_add,}})
 
@@ -191,13 +191,13 @@ class ReinitializationAPIView(APIView):
             Buildings.objects.filter(user_id=user_id).update(building_level=0,
                                                             created_at=timezone.now())
             # à tester
-            resources_start = {'metal': 1000, 'crystal': 1000, 'deuterium': 0,
+            resources_start = {'metal': 1000, 'crystal': 1000, 'tritium': 0,
                                'satellites': 0, 'booster': 1}
             for key, value in resources_start.items():
 
                 Resources.objects.filter(user_id=user_id, resource_type=key).update(resource_value=value, created_at=timezone.now())
-            Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0)
-            PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, deuterium=0,
+            Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, tritium=0)
+            PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, tritium=0,
                                                                      is_discovered=0)
             Starship.objects.filter(user_id=user_id).update(is_built=0, fight_exp=0)
             

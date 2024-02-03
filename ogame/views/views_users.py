@@ -40,12 +40,12 @@ class RegisterAPIView(APIView):
             Users.objects.create(pseudo=pseudo, email=email, password=password_hashed, 
                                     created_at=timezone.now())
             user = Users.objects.latest('id')
-            buildings = ['metal', 'crystal', 'deuterium', 'energy']
+            buildings = ['metal', 'crystal', 'tritium', 'energy']
             buildings_to_insert = []
             for building in buildings:
                 buildings_to_insert.append(Buildings(building_type=building, building_level=0, users_id=user.id, created_at=timezone.now()))
             Buildings.objects.bulk_create(buildings_to_insert)
-            resources = ['metal', 'crystal', 'deuterium', 'booster', 'satellites']
+            resources = ['metal', 'crystal', 'tritium', 'booster', 'satellites']
             resources_to_insert = []
             for resource in resources:
                 value = 0
@@ -62,16 +62,16 @@ class RegisterAPIView(APIView):
             for search in searches:
                 metal_value = 0
                 crystal_value = 0
-                deuterium_value = 0
+                tritium_value = 0
                 if search == 'fire':
                     crystal_value = 50
                 if search == 'life':
                     metal_value = 100
                 if search == 'shield':
-                    deuterium_value = 20
+                    tritium_value = 20
                 searches_to_insert.append(Searches(search_type=search, search_level=0, users_id=user.id, 
                                                     metal=metal_value, crystal=crystal_value,
-                                                    deuterium=deuterium_value, created_at=timezone.now()))
+                                                    tritium=tritium_value, created_at=timezone.now()))
             Searches.objects.bulk_create(searches_to_insert)
             Starship.objects.create(is_built=0, fight_exp=0, users_id=user.id, created_at=timezone.now())
             

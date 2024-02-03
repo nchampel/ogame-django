@@ -27,11 +27,11 @@ class CreatePlanetsAPIView(APIView):
                     name = str(i) + '.' + str(t + 1)
                     metal_level = randrange(1 * (i + 1), 10 * (i + 1))
                     crystal_level = randrange(1 * (i + 1), 10 * (i + 1))
-                    deuterium_level = randrange(1 * (i + 1), 10 * (i + 1))
+                    tritium_level = randrange(1 * (i + 1), 10 * (i + 1))
                     # if i == 0:
                     # print(name)
                     # print(metal_level)
-                    planets_to_create.append(Planets(user_id=user_id, name=name, metal_level=metal_level, crystal_level=crystal_level, deuterium_level=deuterium_level, created_at=timezone.now()))
+                    planets_to_create.append(Planets(user_id=user_id, name=name, metal_level=metal_level, crystal_level=crystal_level, tritium_level=tritium_level, created_at=timezone.now()))
             Planets.objects.bulk_create(planets_to_create)
 
             return JsonResponse({'msg': 'Planètes créées'})
@@ -49,7 +49,7 @@ class GetPlanetsDataAPIView(APIView):
             serializer = PlanetsSerializer(planets, many=True).data
 
             for idx, planet in enumerate(serializer):
-                resources_on_planet = planet['metal'] + planet['crystal'] + planet['deuterium']
+                resources_on_planet = planet['metal'] + planet['crystal'] + planet['tritium']
                 serializer[idx]['cost'] = round(resources_on_planet / 10)
 
             return Response(serializer)
@@ -67,7 +67,7 @@ class SaveResourcesPlanetsAPIView(APIView):
             for planet in planets:
 
                 Planets.objects.filter(id=planet['id']).update(metal=planet['metal'],
-                                        crystal=planet['crystal'], deuterium=planet['deuterium'])
+                                        crystal=planet['crystal'], tritium=planet['tritium'])
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources des planètes sauvegardées'})
