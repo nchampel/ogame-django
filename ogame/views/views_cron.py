@@ -8,6 +8,7 @@ from django.db.models import Case, When, Value, IntegerField, F
 from environ import Env
 # from datetime import datetime as dt
 from django.utils import timezone
+from decimal import Decimal
 
 from ogame.models import Resources, Planets, PlanetsMultiverse, Users, Buildings
 
@@ -50,17 +51,25 @@ class CronAddResourcesAPIView(APIView):
                             buildings_player = {bp[0]: bp[1] for bp in buildings}
                             for resource in resources_player:
                                 if 'metal' in resource:
-                                    resource['metal'] += 12 + 8 * booster * round(30 * buildings_player['metal'] * 1.1 ** buildings_player['metal'] / 60)
+                                    resource['metal'] += 1.2 + 8 * booster * 30 * buildings_player['metal'] * 1.1 ** buildings_player['metal'] / 60
+                                    # arrondir à 2 décimales
+                                    decimal_number = Decimal(resource['metal'])
+                                    resource['metal'] = '{:.2f}'.format(decimal_number)
                                 if 'crystal' in resource:
-                                    resource['crystal'] += 6 + 8 * booster * round(20 * buildings_player['crystal'] * 1.1 ** buildings_player['crystal'] / 60)
+                                    resource['crystal'] += 0.6 + 8 * booster * 20 * buildings_player['crystal'] * 1.1 ** buildings_player['crystal'] / 60
+                                    decimal_number = Decimal(resource['crystal'])
+                                    resource['crystal'] = '{:.2f}'.format(decimal_number)
                                 if 'tritium' in resource:
-                                    resource['tritium'] += 0 + 8 * booster * round(10 * buildings_player['tritium'] * 1.1 ** buildings_player['tritium'] / 60)
-                            
+                                    resource['tritium'] += 0 + 8 * booster * 10 * buildings_player['tritium'] * 1.1 ** buildings_player['tritium'] / 60
+                                    decimal_number = Decimal(resource['tritium'])
+                                    resource['tritium'] = '{:.2f}'.format(decimal_number)
+                            # print(10 * buildings_player['tritium'] * 1.1 ** buildings_player['tritium'] / 60)
+                            # print(booster)
                             resources_to_update = saveResourcesPlayer(types, resources_player)
                             # print('resources_to_update', resources_to_update)
                             for rtu in resources_to_update:
                                 resources_to_update_players.append(rtu)
-                print('resources_to_update_players', resources_to_update_players)
+                # print('resources_to_update_players', resources_to_update_players)
                 if len(resources_to_update_players) > 0:
                     Resources.objects.bulk_update(resources_to_update_players, ['resource_value'], batch_size=len(resources_to_update_players))
                 
