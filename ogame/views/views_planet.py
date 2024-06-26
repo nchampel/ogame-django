@@ -172,8 +172,7 @@ class SaveBoosterCoefficientAPIView(APIView):
         user_id = authenticate(request)
         try :
             coefficient = request.data['coefficient']
-            Resources.objects.filter(users_id=user_id, resource_type='booster').update(resource_value=coefficient)
-
+            t = Resources.objects.filter(users_id=user_id, resource_type='booster').update(resource_value=coefficient)
             booster = Boosters.objects.filter(coefficient=coefficient).first()
 
             return JsonResponse({'coefficient': coefficient, 'cost': booster.cost})

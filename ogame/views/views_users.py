@@ -244,3 +244,31 @@ class SaveNatureAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde de l\'alignement BGZ'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class GetLinkUnityAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        try:
+            user = Users.objects.filter(id=user_id).first()
+            return JsonResponse({'unity_link': user.unity_link})
+            
+        except:
+            content = {
+                'msg': 'Erreur lors de la récupération du Lien-Unité'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class SaveLinkUnityAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        try:
+            unity_link = request.data['unity_link']
+            Users.objects.filter(id=user_id).update(unity_link=unity_link)
+            return JsonResponse({'msg': "Lien-Unité sauvegardé"})
+            
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde du Lien-Unité'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        

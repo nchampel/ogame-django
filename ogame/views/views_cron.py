@@ -28,6 +28,7 @@ class CronAddResourcesAPIView(APIView):
                 for user in users:
                     if user.nature is not None:
                         resources = Resources.objects.filter(users=user).values_list('resource_type', 'resource_value', 'id', 'updated_at')
+                        # print(resources)
                         resources_player = [{rp[0]: rp[1], 'id': rp[2]} for rp in resources]
                         updated_at = resources[0][3]
                         # print('updtaed', dt.fromisoformat(updated_at))
