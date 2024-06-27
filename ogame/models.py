@@ -22,7 +22,7 @@ class Users(AbstractBaseUser):
     email = models.fields.EmailField(max_length=100, blank=True, null=False)
     attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
     nature = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
-    unity_link = models.fields.IntegerField(default=500, blank=True, null=True)
+    # unity_link = models.fields.IntegerField(default=500, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     username = None
 

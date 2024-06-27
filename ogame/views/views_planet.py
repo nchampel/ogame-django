@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.utils import timezone
 from collections import defaultdict
+from datetime import date
 from environ import Env
 
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
@@ -166,6 +167,7 @@ class GetBoosterCostAPIView(APIView):
             content = {
                 'msg': 'Erreur lors de la récupération du coût du booster'
             }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
@@ -205,5 +207,41 @@ class ReinitializationAPIView(APIView):
         except:
             content = {
                 'msg': 'Erreur lors de la réinitialisation'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        
+class DetermineDailyHarvestableAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        try:
+            today = date.today()
+            resources = Resources.objects.filter(users_id=user_id, resource_type='unity-link').first()
+
+            is_daily_harvestable = resources.harvested_at is None or resources.harvested_at.date() < today
+            
+            return JsonResponse({'is_daily_harvestable': is_daily_harvestable})
+        except:
+            content = {
+                'msg': 'Erreur lors de la récupération de la récompense journalière'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+class SaveDailyClaimedAPIView(APIView):
+    def post(self, request):
+        user_id = authenticate(request)
+        try:
+            daily_reward = 500
+            unity_link_player = Resources.objects.filter(users_id=user_id, resource_type='unity-link').first()
+            resources = Resources.objects.filter(users_id=user_id, resource_type='unity-link').update(resource_value=daily_reward + unity_link_player.resource_value, harvested_at=timezone.now())
+            if resources:
+
+                return JsonResponse({
+                    'msg': 'récompense sauvegardée',
+                    'unityLink': daily_reward + unity_link_player.resource_value
+                    })
+            else:
+                return JsonResponse({'msg': 'souci lors de la sauvegarde de la récompense'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde de la récompense journalière'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)

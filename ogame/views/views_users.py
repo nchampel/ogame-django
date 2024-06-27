@@ -249,8 +249,10 @@ class GetLinkUnityAPIView(APIView):
     def post(self, request):
         user_id = authenticate(request)
         try:
-            user = Users.objects.filter(id=user_id).first()
-            return JsonResponse({'unity_link': user.unity_link})
+            # user = Users.objects.filter(id=user_id).first()
+            # return JsonResponse({'unity_link': user.unity_link})
+            resources = Resources.objects.filter(users_id=user_id, resource_type='unity-link').first()
+            return JsonResponse({'unity_link': resources.resource_value})
             
         except:
             content = {

@@ -19,7 +19,7 @@ from django.urls import path
 
 from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
 GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
-ReinitializationAPIView, SalutAPIView
+ReinitializationAPIView, SalutAPIView, DetermineDailyHarvestableAPIView, SaveDailyClaimedAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -77,8 +77,11 @@ urlpatterns = [
     path('ranking/get/', GetRankingAPIView.as_view()),
     path('unity-link/get/', GetLinkUnityAPIView.as_view()),
     path('unity-link/save/', SaveLinkUnityAPIView.as_view()),
+    path('unity-link/daily/get/', DetermineDailyHarvestableAPIView.as_view()),
+    path('unity-link/daily/save/', SaveDailyClaimedAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
+    # path('cron/unity-link/daily/', CronUnityLinkDailyAPIView.as_view()),
 
     path('test/', testAPIView.as_view()),
 
