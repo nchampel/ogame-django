@@ -19,7 +19,11 @@ from django.urls import path
 
 from ogame.views.views_planet import GetResourcesAPIView, SaveResourcesAPIView, GetBuildingsAPIView, \
 GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoosterCoefficientAPIView, \
-ReinitializationAPIView, SalutAPIView, DetermineDailyHarvestableAPIView, SaveDailyClaimedAPIView
+ReinitializationAPIView, SalutAPIView
+
+from ogame.views.views_shop import DetermineDailyHarvestableAPIView, SaveDailyClaimedAPIView, \
+SaveLinkUnityAPIView, GetLinkUnityAPIView, GetShopItemsDataAPIView, SaveItemUsingAPIView, \
+SaveItemBoughtAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -31,7 +35,7 @@ from ogame.views.views_starship import GetStarshipDataAPIView, BuildStarshipAPIV
 from ogame.views.views_search import SaveSearchLevelAPIView, GetSearchLevelsAPIView
 
 from ogame.views.views_users import RegisterAPIView, LoginAPIView, ReinitializeAttemptsAPIView,\
-VerifyJWTAPIView, DetermineNatureAPIView, SaveNatureAPIView, SaveLinkUnityAPIView, GetLinkUnityAPIView
+VerifyJWTAPIView, DetermineNatureAPIView, SaveNatureAPIView
 
 from ogame.views.views_cron import CronAddResourcesAPIView
 
@@ -75,10 +79,14 @@ urlpatterns = [
     path('nature/determine/', DetermineNatureAPIView.as_view()),
     path('nature/save/', SaveNatureAPIView.as_view()),
     path('ranking/get/', GetRankingAPIView.as_view()),
+
     path('unity-link/get/', GetLinkUnityAPIView.as_view()),
     path('unity-link/save/', SaveLinkUnityAPIView.as_view()),
     path('unity-link/daily/get/', DetermineDailyHarvestableAPIView.as_view()),
     path('unity-link/daily/save/', SaveDailyClaimedAPIView.as_view()),
+    path('shop-items/get/', GetShopItemsDataAPIView.as_view()),
+    path('shop-items/using/save/', SaveItemUsingAPIView.as_view()),
+    path('shop-items/bought/save/', SaveItemBoughtAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
     # path('cron/unity-link/daily/', CronUnityLinkDailyAPIView.as_view()),

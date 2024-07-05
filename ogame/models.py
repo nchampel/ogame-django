@@ -187,3 +187,13 @@ class Logs(models.Model):
     created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
     class Meta:
         db_table = "logs"
+class ShopItems(models.Model):
+    item_quantity = models.fields.IntegerField(default=0)
+    users = models.ForeignKey(Users, on_delete=models.RESTRICT, default=None, blank=True, null=True)
+    item_type = models.fields.CharField(max_length=50)
+    item_used = models.fields.IntegerField(default=0)
+    item_bought = models.fields.IntegerField(default=0)
+    purchasable = models.fields.BooleanField(default=False)
+    created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
+    class Meta:
+        db_table = "shop_items"

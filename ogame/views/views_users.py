@@ -40,12 +40,12 @@ class RegisterAPIView(APIView):
             Users.objects.create(pseudo=pseudo, email=email, password=password_hashed, 
                                     created_at=timezone.now())
             user = Users.objects.latest('id')
-            buildings = ['metal', 'crystal', 'tritium', 'energy']
+            buildings = ['metal', 'crystal', 'tritium', 'energy', 'unity-link generator', 'ticket generator']
             buildings_to_insert = []
             for building in buildings:
                 buildings_to_insert.append(Buildings(building_type=building, building_level=0, users_id=user.id, created_at=timezone.now()))
             Buildings.objects.bulk_create(buildings_to_insert)
-            resources = ['metal', 'crystal', 'tritium', 'booster', 'satellites']
+            resources = ['metal', 'crystal', 'tritium', 'booster', 'satellites', 'unity-link']
             resources_to_insert = []
             for resource in resources:
                 value = 0
@@ -55,6 +55,8 @@ class RegisterAPIView(APIView):
                     value = 1000
                 if resource == 'booster':
                     value = 1
+                if resource == 'unity-link':
+                    value = 500
                 resources_to_insert.append(Resources(resource_type=resource, resource_value=value, users_id=user.id, created_at=timezone.now()))
             Resources.objects.bulk_create(resources_to_insert)
             searches = ['life', 'fire', 'shield']
@@ -244,33 +246,5 @@ class SaveNatureAPIView(APIView):
                 'msg': 'Erreur lors de la sauvegarde de l\'alignement BGZ'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        
-class GetLinkUnityAPIView(APIView):
-    def post(self, request):
-        user_id = authenticate(request)
-        try:
-            # user = Users.objects.filter(id=user_id).first()
-            # return JsonResponse({'unity_link': user.unity_link})
-            resources = Resources.objects.filter(users_id=user_id, resource_type='unity-link').first()
-            return JsonResponse({'unity_link': resources.resource_value})
-            
-        except:
-            content = {
-                'msg': 'Erreur lors de la récupération du Lien-Unité'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        
-class SaveLinkUnityAPIView(APIView):
-    def post(self, request):
-        user_id = authenticate(request)
-        try:
-            unity_link = request.data['unity_link']
-            Users.objects.filter(id=user_id).update(unity_link=unity_link)
-            return JsonResponse({'msg': "Lien-Unité sauvegardé"})
-            
-        except:
-            content = {
-                'msg': 'Erreur lors de la sauvegarde du Lien-Unité'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
         
