@@ -10,7 +10,7 @@ from environ import Env
 import jwt, datetime as dt
 from typing import Dict
 
-from ogame.models import Users, Token, Buildings, Resources, Searches, Starship, Logs
+from ogame.models import Users, Token, Buildings, Resources, Searches, Starship, Logs, ShopItems
 
 from ogame.functions import authenticate
 
@@ -40,11 +40,21 @@ class RegisterAPIView(APIView):
             Users.objects.create(pseudo=pseudo, email=email, password=password_hashed, 
                                     created_at=timezone.now())
             user = Users.objects.latest('id')
-            buildings = ['metal', 'crystal', 'tritium', 'energy', 'unity-link generator', 'ticket generator']
+            buildings = ['metal', 'crystal', 'tritium', 'energy', 'unity-link_generator', 'ticket_generator']
             buildings_to_insert = []
             for building in buildings:
                 buildings_to_insert.append(Buildings(building_type=building, building_level=0, users_id=user.id, created_at=timezone.now()))
             Buildings.objects.bulk_create(buildings_to_insert)
+            shop_items = ['1 hour', '2 hours', '1 day', '2 days', '1 week']
+            purchasable = False
+            shop_items_to_insert = []
+            for shop_item in shop_items:
+                if shop_item == '1 hour':
+                    purchasable = True
+                shop_items_to_insert.append(ShopItems(item_type=shop_item, item_quantity=0, users_id=user.id, 
+                                                    item_used=0, item_bought=0, purchasable=purchasable,
+                                                    created_at=timezone.now()))
+            ShopItems.objects.bulk_create(shop_items_to_insert)
             resources = ['metal', 'crystal', 'tritium', 'booster', 'satellites', 'unity-link']
             resources_to_insert = []
             for resource in resources:

@@ -25,3 +25,7 @@ class ShopItemsSerializer(ModelSerializer):
     class Meta:
         model = ShopItems
         exclude = ['id', 'created_at', 'users']
+class BuildingsSerializer(ModelSerializer):
+    class Meta:
+        model = Buildings
+        exclude = ['id', 'created_at', 'users']

@@ -9,7 +9,7 @@ from environ import Env
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
 Planets, PlanetsMultiverse, Starship
 
-from ogame.serializers import ResourcesSerializer
+from ogame.serializers import ResourcesSerializer, BuildingsSerializer
 
 from ogame.functions import authenticate
 
@@ -56,23 +56,23 @@ class GetResourcesAPIView(APIView):
 class SaveResourcesAPIView(APIView):
     def post(self, request):
         user_id = authenticate(request)
-        # try :
-        resources = request.data['resources']
-        print(resources)
-        for key, value in resources.items():
-            # print(key, value)
-            Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
-        # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
-        #                             crystal=resources['crystal'], tritium=resources['tritium'],
-        #                             satellites=resources['satellites'])
-        # resources_values = {'metal': resource.metal}
+        try :
+            resources = request.data['resources']
+            # print(resources)
+            for key, value in resources.items():
+                # print(key, value)
+                Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
+            # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
+            #                             crystal=resources['crystal'], tritium=resources['tritium'],
+            #                             satellites=resources['satellites'])
+            # resources_values = {'metal': resource.metal}
 
-        return JsonResponse({'msg': 'Ressources sauvegardées'})
-        # except:
-        #     content = {
-        #         'msg': 'Erreur lors de la sauvegarde des ressources'
-        #     }
-        #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'msg': 'Ressources sauvegardées'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde des ressources'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class GetBuildingsAPIView(APIView):
     def post(self, request):
@@ -81,14 +81,23 @@ class GetBuildingsAPIView(APIView):
             # courses_id = escape(request.data['courses_id'])
             buildings = Buildings.objects.filter(users_id=user_id)
             
-            building_levels = {'metal': 0, 'crystal': 0, 'tritium': 0, 'energy': 0}
+            building_levels = {'metal': 0, 'crystal': 0, 'tritium': 0, 'energy': 0,
+                               'unity-link_generator': 0, 'ticket_generator': 0}
 
             for building in buildings:
                 building_levels[building.building_type] = building.building_level
             return JsonResponse({'metal': building_levels['metal'],
                                     'crystal': building_levels['crystal'],
                                     'tritium': building_levels['tritium'],
-                                    'energy': building_levels['energy'],})
+                                    'energy': building_levels['energy'],
+                                    'unity-link_generator': building_levels['unity-link_generator'],
+                                    'ticket_generator': building_levels['ticket_generator'],
+                                     })
+
+            # buildings = Buildings.objects.filter(users_id=user_id)
+            # serializer = BuildingsSerializer(buildings, many=True).data
+
+            # return JsonResponse(serializer, safe=False)
         
             buildings = Buildings.objects.filter(users_id=user_id).values('building_type', 'building_level')
             

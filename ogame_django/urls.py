@@ -23,7 +23,7 @@ ReinitializationAPIView, SalutAPIView
 
 from ogame.views.views_shop import DetermineDailyHarvestableAPIView, SaveDailyClaimedAPIView, \
 SaveLinkUnityAPIView, GetLinkUnityAPIView, GetShopItemsDataAPIView, SaveItemUsingAPIView, \
-SaveItemBoughtAPIView
+SaveItemBoughtAPIView, GetDisplayBuildingsShopLevelsAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -87,6 +87,7 @@ urlpatterns = [
     path('shop-items/get/', GetShopItemsDataAPIView.as_view()),
     path('shop-items/using/save/', SaveItemUsingAPIView.as_view()),
     path('shop-items/bought/save/', SaveItemBoughtAPIView.as_view()),
+    path('shop-buildings/display/get/', GetDisplayBuildingsShopLevelsAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
     # path('cron/unity-link/daily/', CronUnityLinkDailyAPIView.as_view()),
