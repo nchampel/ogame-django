@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from ogame.models import Planets, PlanetsMultiverse, Buildings, Resources, Starship
+from ogame.models import Planets, PlanetsMultiverse, Buildings, Resources, Starship, ShopItems
 
 class PlanetsSerializer(ModelSerializer):
     class Meta:
@@ -21,3 +21,11 @@ class StarshipSerializer(ModelSerializer):
     class Meta:
         model = Starship
         exclude = ['id', 'created_at']
+class ShopItemsSerializer(ModelSerializer):
+    class Meta:
+        model = ShopItems
+        exclude = ['id', 'created_at', 'users']
+class BuildingsSerializer(ModelSerializer):
+    class Meta:
+        model = Buildings
+        exclude = ['id', 'created_at', 'users']

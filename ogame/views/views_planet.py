@@ -7,9 +7,9 @@ from collections import defaultdict
 from environ import Env
 
 from ogame.models import Resources, Buildings, BuildingsResources, Boosters, \
-Planets, PlanetsMultiverse, Starship
+Planets, PlanetsMultiverse, Starship, Logs
 
-from ogame.serializers import ResourcesSerializer
+from ogame.serializers import ResourcesSerializer, BuildingsSerializer
 
 from ogame.functions import authenticate
 
@@ -34,14 +34,14 @@ class GetResourcesAPIView(APIView):
             # courses_id = escape(request.data['courses_id'])
             resources = Resources.objects.filter(users_id=user_id)
 
-            resources_values = {'metal': 0, 'crystal': 0, 'tritium': 0, 'satellites': 0, 'booster': 1}
+            resources_values = {'carbon': 0, 'diamond': 0, 'magic': 0, 'power_generator': 0, 'booster': 1}
 
             for resource in resources:
                 resources_values[resource.resource_type] = resource.resource_value
-            return JsonResponse({'metal': resources_values['metal'],
-                                 'crystal': resources_values['crystal'],
-                                 'tritium': resources_values['tritium'],
-                                 'satellites': resources_values['satellites'],
+            return JsonResponse({'carbon': resources_values['carbon'],
+                                 'diamond': resources_values['diamond'],
+                                 'magic': resources_values['magic'],
+                                 'power_generator': resources_values['power_generator'],
                                  'booster': resources_values['booster'],
                                  })
             serializer = ResourcesSerializer(resource).data
@@ -56,23 +56,23 @@ class GetResourcesAPIView(APIView):
 class SaveResourcesAPIView(APIView):
     def post(self, request):
         user_id = authenticate(request)
-        # try :
-        resources = request.data['resources']
-        print(resources)
-        for key, value in resources.items():
-            # print(key, value)
-            Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
-        # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
-        #                             crystal=resources['crystal'], tritium=resources['tritium'],
-        #                             satellites=resources['satellites'])
-        # resources_values = {'metal': resource.metal}
+        try :
+            resources = request.data['resources']
+            # print(resources)
+            for key, value in resources.items():
+                # print(key, value)
+                Resources.objects.filter(users_id=user_id, resource_type=key).update(resource_value=value, updated_at=timezone.now())
+            # Resources.objects.filter(users_id=user_id).update(metal=resources['metal'],
+            #                             crystal=resources['crystal'], tritium=resources['tritium'],
+            #                             satellites=resources['satellites'])
+            # resources_values = {'metal': resource.metal}
 
-        return JsonResponse({'msg': 'Ressources sauvegardées'})
-        # except:
-        #     content = {
-        #         'msg': 'Erreur lors de la sauvegarde des ressources'
-        #     }
-        #     return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'msg': 'Ressources sauvegardées'})
+        except:
+            content = {
+                'msg': 'Erreur lors de la sauvegarde des ressources'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class GetBuildingsAPIView(APIView):
     def post(self, request):
@@ -81,14 +81,24 @@ class GetBuildingsAPIView(APIView):
             # courses_id = escape(request.data['courses_id'])
             buildings = Buildings.objects.filter(users_id=user_id)
             
-            building_levels = {'metal': 0, 'crystal': 0, 'tritium': 0, 'energy': 0}
+            building_levels = {'carbon': 0, 'diamond': 0, 'magic': 0, 'energy': 0,
+                               'unity-link_generator': 0, 'ticket_generator': 0,'protective_dome': 0}
 
             for building in buildings:
                 building_levels[building.building_type] = building.building_level
-            return JsonResponse({'metal': building_levels['metal'],
-                                    'crystal': building_levels['crystal'],
-                                    'tritium': building_levels['tritium'],
-                                    'energy': building_levels['energy'],})
+            return JsonResponse({'carbon': building_levels['carbon'],
+                                    'diamond': building_levels['diamond'],
+                                    'magic': building_levels['magic'],
+                                    'energy': building_levels['energy'],
+                                    'unity-link_generator': building_levels['unity-link_generator'],
+                                    'ticket_generator': building_levels['ticket_generator'],
+                                    'protective_dome': building_levels['protective_dome'],
+                                     })
+
+            # buildings = Buildings.objects.filter(users_id=user_id)
+            # serializer = BuildingsSerializer(buildings, many=True).data
+
+            # return JsonResponse(serializer, safe=False)
         
             buildings = Buildings.objects.filter(users_id=user_id).values('building_type', 'building_level')
             
@@ -110,7 +120,7 @@ class GetBuildingsResourcesAPIView(APIView):
         user_id = authenticate(request)
         try :
             # courses_id = escape(request.data['courses_id'])
-            types = ['metal', 'crystal', 'tritium', 'energy']
+            types = ['carbon', 'diamond', 'magic', 'energy']
 
             # Obtenez toutes les valeurs des ressources pour les types spécifiés en une seule requête
             buildings_resources_values = BuildingsResources.objects.filter(type__in=types)
@@ -124,9 +134,9 @@ class GetBuildingsResourcesAPIView(APIView):
                 building_resources_values = next((brv for brv in buildings_resources_values if brv.type == t), None)
                 
                 # Ajoutez la valeur à la liste résultante
-                buildings_resources_values_all.append({t: {'metal': building_resources_values.metal,
-                                'crystal': building_resources_values.crystal,
-                                'tritium': building_resources_values.tritium,
+                buildings_resources_values_all.append({t: {'carbon': building_resources_values.carbon,
+                                'diamond': building_resources_values.diamond,
+                                'magic': building_resources_values.magic,
                                 'energy': building_resources_values.energy,
                                 'resource_to_add': building_resources_values.resource_to_add,}})
 
@@ -147,6 +157,18 @@ class SaveLevelAPIView(APIView):
             Buildings.objects.filter(users_id=user_id, building_type=type).update(building_level=level)
             # resources_values = {'metal': resource.metal}
 
+            buildings_names = {
+                'carbon': "Synthétiseur de carbone",
+                'diamond': "Raffinerie de diamants",
+                'magic': "Extracteur de magie",
+                'energy': "Génératrice d'énergie",
+                'protective_dome': "Dôme protecteur"
+            }
+
+            description = "Bâtiment " + buildings_names[type] + " niveau " + str(level) + " obtenu"
+
+            Logs.objects.create(type='planète', category='bâtiments', users_id=user_id, description=description, target=user_id, created_at=timezone.now())
+
             return JsonResponse({'msg': 'Ressources ajoutées'})
         except:
             content = {
@@ -166,15 +188,19 @@ class GetBoosterCostAPIView(APIView):
             content = {
                 'msg': 'Erreur lors de la récupération du coût du booster'
             }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 class SaveBoosterCoefficientAPIView(APIView):
     def post(self, request):
         user_id = authenticate(request)
         try :
             coefficient = request.data['coefficient']
-            Resources.objects.filter(users_id=user_id, resource_type='booster').update(resource_value=coefficient)
-
+            t = Resources.objects.filter(users_id=user_id, resource_type='booster').update(resource_value=coefficient)
             booster = Boosters.objects.filter(coefficient=coefficient).first()
+
+            description = "Booster niveau " + str(coefficient) + " obtenu"
+
+            Logs.objects.create(type='planète', category='ressources', users_id=user_id, description=description, target=user_id, created_at=timezone.now())
 
             return JsonResponse({'coefficient': coefficient, 'cost': booster.cost})
         except:
@@ -191,13 +217,13 @@ class ReinitializationAPIView(APIView):
             Buildings.objects.filter(user_id=user_id).update(building_level=0,
                                                             created_at=timezone.now())
             # à tester
-            resources_start = {'metal': 1000, 'crystal': 1000, 'tritium': 0,
-                               'satellites': 0, 'booster': 1}
+            resources_start = {'carbon': 1000, 'diamond': 1000, 'magic': 0,
+                               'power_generator': 0, 'booster': 1}
             for key, value in resources_start.items():
 
                 Resources.objects.filter(user_id=user_id, resource_type=key).update(resource_value=value, created_at=timezone.now())
-            Planets.objects.filter(user_id=user_id).update(metal=0, crystal=0, tritium=0)
-            PlanetsMultiverse.objects.filter(user_id=user_id).update(metal=0, crystal=0, tritium=0,
+            Planets.objects.filter(user_id=user_id).update(carbon=0, diamond=0, magic=0)
+            PlanetsMultiverse.objects.filter(user_id=user_id).update(carbon=0, diamond=0, magic=0,
                                                                      is_discovered=0)
             Starship.objects.filter(user_id=user_id).update(is_built=0, fight_exp=0)
             
@@ -208,3 +234,4 @@ class ReinitializationAPIView(APIView):
                 'msg': 'Erreur lors de la réinitialisation'
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        

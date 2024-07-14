@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from environ import Env
 
-from ogame.models import Searches
+from ogame.models import Searches, Logs
 
 from ogame.functions import authenticate
 
@@ -21,19 +21,17 @@ class GetSearchLevelsAPIView(APIView):
             
             searches = Searches.objects.filter(users_id=user_id)
 
-            search_levels = {'life': 0, 'fire': 0, 'shield': 0, }
+            search_levels = {'life': 0, 'fire': 0, 'shield': 0, 'energy': 0, 'electricity': 0}
 
             for search in searches:
-                resources_needed = {'metal': 0, 'crystal': 0, 'tritium': 0}
+                resources_needed = {'carbon': 0, 'diamond': 0, 'magic': 0}
 
                 for resource in resources_needed:
-                    # print(resource)
-                    # print(search[resource])
                     resources_needed[resource] = getattr(search, resource)
                 search_levels[search.search_type] = {'level': search.search_level, 
-                                                     'metal': search.metal,
-                                                     'crystal': search.crystal,
-                                                     'tritium': search.tritium}
+                                                     'carbon': search.carbon,
+                                                     'diamond': search.diamond,
+                                                     'magic': search.magic}
             # print(search_levels)
             return JsonResponse(search_levels)
                 
@@ -58,6 +56,19 @@ class SaveSearchLevelAPIView(APIView):
             level = request.data['level']
             Searches.objects.filter(users_id=user_id, search_type=type).update(search_level=level)
             # resources_values = {'metal': resource.metal}
+
+            searches_names = {
+                'energy': "Energie",
+                'electricity': "Electricité",
+                "life": "Vie",
+                'shield': "Bouclier",
+                'fire': "Armes",
+                'time': 'Accélération de temps'
+            }
+
+            description = searches_names[type] + " niveau " + str(level) + " obtenu"
+
+            Logs.objects.create(type='recherche', category='recherche', users_id=user_id, description=description, target=user_id, created_at=timezone.now())
 
             return JsonResponse({'msg': 'Niveau de recherche sauvegardé'})
         except:
