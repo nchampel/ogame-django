@@ -43,17 +43,17 @@ class BuildStarshipAPIView(APIView):
             for search in searches:
                 search_levels[search.search_type] = search.search_level
 
-            resources_needed = {'metal': 1000000 * search_levels['life'], 'crystal': 1000000 * search_levels['fire'],
-                                'tritium': 1000000 * search_levels['shield']}
+            resources_needed = {'carbon': 1000000 * search_levels['life'], 'diamond': 1000000 * search_levels['fire'],
+                                'magic': 1000000 * search_levels['shield']}
             resources = Resources.objects.filter(users_id=user_id).first()
 
-            if not starship.is_built and resources_needed['metal'] <= resources.metal and resources_needed['crystal'] <= resources.crystal and resources_needed['tritium'] <= resources.tritium:
+            if not starship.is_built and resources_needed['carbon'] <= resources.carbon and resources_needed['diamond'] <= resources.diamond and resources_needed['magic'] <= resources.magic:
                 Starship.objects.filter(users_id=user_id).update(is_built=1)
-                remaining_metal = resources.metal - resources_needed['metal']
-                remaining_crystal = resources.crystal - resources_needed['crystal']
-                remaining_tritium = resources.tritium - resources_needed['tritium']
-                Resources.objects.filter(users_id=user_id).update(metal=remaining_metal,
-                                        crystal=remaining_crystal, tritium=remaining_tritium)
+                remaining_carbon = resources.carbon - resources_needed['carbon']
+                remaining_diamond = resources.diamond - resources_needed['diamond']
+                remaining_magic = resources.magic - resources_needed['magic']
+                Resources.objects.filter(users_id=user_id).update(carbon=remaining_carbon,
+                                        diamond=remaining_diamond, magic=remaining_magic)
 
             return JsonResponse({'msg': 'Vaisseau construit'})
         except:

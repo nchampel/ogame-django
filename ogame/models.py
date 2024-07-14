@@ -22,7 +22,9 @@ class Users(AbstractBaseUser):
     email = models.fields.EmailField(max_length=100, blank=True, null=False)
     attempts_connection = models.fields.IntegerField(default=0, blank=True, null=True)
     nature = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
-    # unity_link = models.fields.IntegerField(default=500, blank=True, null=True)
+    unity_link_invested = models.fields.IntegerField(default=0, blank=True, null=True)
+    resources_invested = models.fields.BigIntegerField(default=0, blank=True, null=True)
+    is_admin = models.fields.BooleanField(default=0, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
     username = None
 
@@ -81,9 +83,9 @@ class Buildings(models.Model):
 class BuildingsResources(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     type = models.fields.CharField(max_length=50)
-    metal = models.fields.IntegerField(default=0, blank=True, null=True)
-    crystal = models.fields.IntegerField(default=0, blank=True, null=True)
-    tritium = models.fields.IntegerField(default=0, blank=True, null=True)
+    carbon = models.fields.IntegerField(default=0, blank=True, null=True)
+    diamond = models.fields.IntegerField(default=0, blank=True, null=True)
+    magic = models.fields.IntegerField(default=0, blank=True, null=True)
     energy = models.fields.IntegerField(default=0, blank=True, null=True)
     resource_to_add = models.fields.IntegerField(default=0, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
@@ -101,12 +103,12 @@ class Boosters(models.Model):
 class Planets(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.fields.CharField(max_length=50)
-    metal = models.fields.FloatField(default=0, blank=True, null=True)
-    crystal = models.fields.FloatField(default=0, blank=True, null=True)
-    tritium = models.fields.FloatField(default=0, blank=True, null=True)
-    metal_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    crystal_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    tritium_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    carbon = models.fields.FloatField(default=0, blank=True, null=True)
+    diamond = models.fields.FloatField(default=0, blank=True, null=True)
+    magic = models.fields.FloatField(default=0, blank=True, null=True)
+    carbon_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    diamond_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    magic_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE,default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0, default=None, blank=True, null=True)
@@ -119,12 +121,12 @@ class PlanetsMultiverse(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.fields.CharField(max_length=50)
     type = models.fields.CharField(max_length=50)
-    metal = models.fields.FloatField(default=0, blank=True, null=True)
-    crystal = models.fields.FloatField(default=0, blank=True, null=True)
-    tritium = models.fields.FloatField(default=0, blank=True, null=True)
-    metal_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    crystal_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    tritium_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    carbon = models.fields.FloatField(default=0, blank=True, null=True)
+    diamond = models.fields.FloatField(default=0, blank=True, null=True)
+    magic = models.fields.FloatField(default=0, blank=True, null=True)
+    carbon_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    diamond_level = models.fields.IntegerField(default=0, blank=True, null=True)
+    magic_level = models.fields.IntegerField(default=0, blank=True, null=True)
     # has_headquarter = models.fields.BooleanField(default=0, blank=True, null=True)
     life_level = models.fields.IntegerField(default=0, blank=True, null=True)
     fire_level = models.fields.IntegerField(default=0, blank=True, null=True)
@@ -169,9 +171,9 @@ class Searches(models.Model):
     # users = models.ForeignKey(Users, on_delete=models.CASCADE)
     search_type = models.fields.CharField(max_length=50, default=None, blank=True, null=True)
     search_level = models.fields.IntegerField(default=0, blank=True, null=True)
-    metal = models.fields.FloatField(default=0, blank=True, null=True)
-    crystal = models.fields.FloatField(default=0, blank=True, null=True)
-    tritium = models.fields.FloatField(default=0, blank=True, null=True)
+    carbon = models.fields.FloatField(default=0, blank=True, null=True)
+    diamond = models.fields.FloatField(default=0, blank=True, null=True)
+    magic = models.fields.FloatField(default=0, blank=True, null=True)
     # user_id = models.fields.IntegerField(default=1, blank=True, null=True)
     users = models.ForeignKey(Users, on_delete=models.CASCADE,default=None, blank=True, null=True)
     created_at = models.fields.DateTimeField(max_length=0)
@@ -193,7 +195,22 @@ class ShopItems(models.Model):
     item_type = models.fields.CharField(max_length=50)
     item_used = models.fields.IntegerField(default=0)
     item_bought = models.fields.IntegerField(default=0)
+    item_won = models.fields.IntegerField(default=0)
     purchasable = models.fields.BooleanField(default=False)
     created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
     class Meta:
         db_table = "shop_items"
+class Config(models.Model):
+    name = models.fields.CharField(max_length=50)
+    value = models.fields.CharField(max_length=50)
+    class Meta:
+        db_table = "config"
+
+class Success(models.Model):
+    users = models.ForeignKey(Users, on_delete=models.RESTRICT, default=None, blank=True, null=True)
+    success_resource_type = models.fields.CharField(max_length=50)
+    success_value = models.fields.IntegerField(default=0)
+    is_won = models.fields.BooleanField(default=False)
+    created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
+    class Meta:
+        db_table = "success"

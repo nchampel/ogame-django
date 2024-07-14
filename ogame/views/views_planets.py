@@ -25,13 +25,13 @@ class CreatePlanetsAPIView(APIView):
             for i in range(10):
                 for t in range(10):
                     name = str(i) + '.' + str(t + 1)
-                    metal_level = randrange(1 * (i + 1), 10 * (i + 1))
-                    crystal_level = randrange(1 * (i + 1), 10 * (i + 1))
-                    tritium_level = randrange(1 * (i + 1), 10 * (i + 1))
+                    carbon_level = randrange(1 * (i + 1), 10 * (i + 1))
+                    diamond_level = randrange(1 * (i + 1), 10 * (i + 1))
+                    magic_level = randrange(1 * (i + 1), 10 * (i + 1))
                     # if i == 0:
                     # print(name)
-                    # print(metal_level)
-                    planets_to_create.append(Planets(user_id=user_id, name=name, metal_level=metal_level, crystal_level=crystal_level, tritium_level=tritium_level, created_at=timezone.now()))
+                    # print(carbon_level)
+                    planets_to_create.append(Planets(user_id=user_id, name=name, carbon_level=carbon_level, diamond_level=diamond_level, magic_level=magic_level, created_at=timezone.now()))
             Planets.objects.bulk_create(planets_to_create)
 
             return JsonResponse({'msg': 'Planètes créées'})
@@ -49,7 +49,7 @@ class GetPlanetsDataAPIView(APIView):
             serializer = PlanetsSerializer(planets, many=True).data
 
             for idx, planet in enumerate(serializer):
-                resources_on_planet = planet['metal'] + planet['crystal'] + planet['tritium']
+                resources_on_planet = planet['carbon'] + planet['diamond'] + planet['magic']
                 serializer[idx]['cost'] = round(resources_on_planet / 10)
 
             return Response(serializer)
@@ -66,8 +66,8 @@ class SaveResourcesPlanetsAPIView(APIView):
             planets = request.data['planets']
             for planet in planets:
 
-                Planets.objects.filter(id=planet['id']).update(metal=planet['metal'],
-                                        crystal=planet['crystal'], tritium=planet['tritium'])
+                Planets.objects.filter(id=planet['id']).update(carbon=planet['carbon'],
+                                        diamond=planet['diamond'], magic=planet['magic'])
             # resources_values = {'metal': resource.metal}
 
             return JsonResponse({'msg': 'Ressources des planètes sauvegardées'})

@@ -22,8 +22,9 @@ GetBuildingsResourcesAPIView, SaveLevelAPIView, GetBoosterCostAPIView, SaveBoost
 ReinitializationAPIView, SalutAPIView
 
 from ogame.views.views_shop import DetermineDailyHarvestableAPIView, SaveDailyClaimedAPIView, \
-SaveLinkUnityAPIView, GetLinkUnityAPIView, GetShopItemsDataAPIView, SaveItemUsingAPIView, \
-SaveItemBoughtAPIView, GetDisplayBuildingsShopLevelsAPIView
+SaveLinkUnityAPIView, GetLinkUnityTicketAPIView, GetShopItemsDataAPIView, SaveItemUsingAPIView, \
+SaveItemBoughtAPIView, GetDisplayBuildingsShopLevelsAPIView, SaveTicketAPIView, GetPriceWonAPIView, \
+SaveItemWonAPIView, SaveUnityLinkInvestedAPIView
 
 from ogame.views.views_planets import GetPlanetsDataAPIView, CreatePlanetsAPIView, SaveResourcesPlanetsAPIView
 
@@ -40,6 +41,10 @@ VerifyJWTAPIView, DetermineNatureAPIView, SaveNatureAPIView
 from ogame.views.views_cron import CronAddResourcesAPIView
 
 from ogame.views.views_ranking import GetRankingAPIView
+
+from ogame.views.views_workshop import SaveLogPowerGeneratorBuiltAPIView
+
+from ogame.views.views_player import SaveResourcesInvestedAPIView, GetIsWebsiteUnderMaintenanceAPIView
 
 from ogame.views.views_test import testAPIView
 
@@ -80,14 +85,23 @@ urlpatterns = [
     path('nature/save/', SaveNatureAPIView.as_view()),
     path('ranking/get/', GetRankingAPIView.as_view()),
 
-    path('unity-link/get/', GetLinkUnityAPIView.as_view()),
+    path('unity-link/get/', GetLinkUnityTicketAPIView.as_view()),
     path('unity-link/save/', SaveLinkUnityAPIView.as_view()),
+    path('unity-link/invested/save/', SaveUnityLinkInvestedAPIView.as_view()),
+    path('ticket/save/', SaveTicketAPIView.as_view()),
     path('unity-link/daily/get/', DetermineDailyHarvestableAPIView.as_view()),
     path('unity-link/daily/save/', SaveDailyClaimedAPIView.as_view()),
     path('shop-items/get/', GetShopItemsDataAPIView.as_view()),
     path('shop-items/using/save/', SaveItemUsingAPIView.as_view()),
     path('shop-items/bought/save/', SaveItemBoughtAPIView.as_view()),
     path('shop-buildings/display/get/', GetDisplayBuildingsShopLevelsAPIView.as_view()),
+    path('shop/price/won/get/', GetPriceWonAPIView.as_view()),
+    path('shop/item/won/save/', SaveItemWonAPIView.as_view()),
+
+    path('workshop/power/generator/log/save/', SaveLogPowerGeneratorBuiltAPIView.as_view()),
+
+    path('player/resources/invested/save/', SaveResourcesInvestedAPIView.as_view()),
+    path('website/maintenance/get/', GetIsWebsiteUnderMaintenanceAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
     # path('cron/unity-link/daily/', CronUnityLinkDailyAPIView.as_view()),

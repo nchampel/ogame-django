@@ -65,9 +65,9 @@ def handleResourcesAttackedPlanet(planet: Dict[str, int], resources: Dict[str, i
     # resources['tritium'] += planet['tritium']
     # Resources.objects.filter(id=user_id).update(metal=resources['metal'],
     #                     crystal=resources['crystal'], tritium=resources['tritium'])
-    PlanetsMultiverse.objects.filter(id=planet['id']).update(metal=round(planet['metal'] / 2), 
-                                                             crystal=round(planet['crystal'] / 2), 
-                                                             tritium=round(planet['tritium'] / 2))
+    PlanetsMultiverse.objects.filter(id=planet['id']).update(carbon=round(planet['carbon'] / 2), 
+                                                             diamond=round(planet['diamond'] / 2), 
+                                                             magic=round(planet['magic'] / 2))
     
 def saveResourcesPlayer(types: List[str], resources_player: Dict[str, int]):
 

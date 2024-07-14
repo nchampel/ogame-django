@@ -22,7 +22,7 @@ class CronAddResourcesAPIView(APIView):
     def get(self, request):
             key = escape(request.GET['key'])
             if key == CRON_KEY:
-                types = ['metal', 'crystal', 'tritium']
+                types = ['carbon', 'diamond', 'magic']
                 users = Users.objects.all()
                 resources_to_update_players = []
                 for user in users:
@@ -51,19 +51,19 @@ class CronAddResourcesAPIView(APIView):
                             buildings = Buildings.objects.filter(users=user).values_list('building_type', 'building_level')
                             buildings_player = {bp[0]: bp[1] for bp in buildings}
                             for resource in resources_player:
-                                if 'metal' in resource:
-                                    resource['metal'] += 1.2 + 8 * booster * 30 * buildings_player['metal'] * 1.1 ** buildings_player['metal'] / 60
+                                if 'carbon' in resource:
+                                    resource['carbon'] += 1.2 + 8 * booster * 30 * buildings_player['carbon'] * 1.1 ** buildings_player['carbon'] / 60
                                     # arrondir à 2 décimales
-                                    decimal_number = Decimal(resource['metal'])
-                                    resource['metal'] = '{:.2f}'.format(decimal_number)
-                                if 'crystal' in resource:
-                                    resource['crystal'] += 0.6 + 8 * booster * 20 * buildings_player['crystal'] * 1.1 ** buildings_player['crystal'] / 60
-                                    decimal_number = Decimal(resource['crystal'])
-                                    resource['crystal'] = '{:.2f}'.format(decimal_number)
-                                if 'tritium' in resource:
-                                    resource['tritium'] += 0 + 8 * booster * 10 * buildings_player['tritium'] * 1.1 ** buildings_player['tritium'] / 60
-                                    decimal_number = Decimal(resource['tritium'])
-                                    resource['tritium'] = '{:.2f}'.format(decimal_number)
+                                    decimal_number = Decimal(resource['carbon'])
+                                    resource['carbon'] = '{:.2f}'.format(decimal_number)
+                                if 'diamond' in resource:
+                                    resource['diamond'] += 0.6 + 8 * booster * 20 * buildings_player['diamond'] * 1.1 ** buildings_player['diamond'] / 60
+                                    decimal_number = Decimal(resource['diamond'])
+                                    resource['diamond'] = '{:.2f}'.format(decimal_number)
+                                if 'magic' in resource:
+                                    resource['magic'] += 0 + 8 * booster * 10 * buildings_player['magic'] * 1.1 ** buildings_player['magic'] / 60
+                                    decimal_number = Decimal(resource['magic'])
+                                    resource['magic'] = '{:.2f}'.format(decimal_number)
                             # print(10 * buildings_player['tritium'] * 1.1 ** buildings_player['tritium'] / 60)
                             # print(booster)
                             resources_to_update = saveResourcesPlayer(types, resources_player)
@@ -76,50 +76,50 @@ class CronAddResourcesAPIView(APIView):
                 
                 # partie planets
                 planets = Planets.objects.all()
-                types_planet = [('metal', 'metal_level'), ('crystal', 'crystal_level'), ('tritium', 'tritium_level')]
+                types_planet = [('carbon', 'carbon_level'), ('diamond', 'diamond_level'), ('magic', 'magic_level')]
                 for planet in planets:
                     
                     for tp in types_planet:
                         type_resource, level = tp
                         resource_planet_type = getattr(planet, type_resource)
                         level_planet_type = getattr(planet, level)
-                        if type_resource == 'metal':
+                        if type_resource == 'carbon':
                             resource_planet_type += round(30 * level_planet_type * 1.1 ** level_planet_type / 60)
-                        if type_resource == 'crystal':
+                        if type_resource == 'diamond':
                             resource_planet_type += round(20 * level_planet_type * 1.1 ** level_planet_type / 60)
-                        if type_resource == 'tritium':
+                        if type_resource == 'magic':
                             resource_planet_type += round(10 * level_planet_type * 1.1 ** level_planet_type / 60)
                         setattr(planet, type_resource, resource_planet_type) 
                 for _ in types:
-                    resources_planets = [{'metal': rp.metal, 'crystal': rp.crystal, 'tritium': rp.tritium, 'id': rp.id} for rp in planets]
+                    resources_planets = [{'carbon': rp.carbon, 'diamond': rp.diamond, 'magic': rp.magic, 'id': rp.id} for rp in planets]
 
                 resources_planets_to_update = saveResourcesPlanets(resources_planets)
 
-                Planets.objects.bulk_update(resources_planets_to_update, ['metal', 'crystal', 'tritium'], batch_size=len(resources_planets_to_update))
+                Planets.objects.bulk_update(resources_planets_to_update, ['carbon', 'diamond', 'magic'], batch_size=len(resources_planets_to_update))
                 
 
                 # partie planets multiverse
                 planets_multiverse = PlanetsMultiverse.objects.all()
-                types_planet_multiverse = [('metal', 'metal_level'), ('crystal', 'crystal_level'), ('tritium', 'tritium_level')]
+                types_planet_multiverse = [('carbon', 'carbon_level'), ('diamond', 'diamond_level'), ('magic', 'magic_level')]
                 for planet_multiverse in planets_multiverse:
                     
                     for tpm in types_planet_multiverse:
                         type_resource, level = tpm
                         resource_planet_multiverse_type = getattr(planet_multiverse, type_resource)
                         level_planet_multiverse_type = getattr(planet_multiverse, level)
-                        if type_resource == 'metal':
+                        if type_resource == 'carbon':
                             resource_planet_multiverse_type += round(30 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
-                        if type_resource == 'crystal':
+                        if type_resource == 'diamond':
                             resource_planet_multiverse_type += round(20 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
-                        if type_resource == 'tritium':
+                        if type_resource == 'magic':
                             resource_planet_multiverse_type += round(10 * level_planet_multiverse_type * 1.1 ** level_planet_multiverse_type / 60)
                         setattr(planet_multiverse, type_resource, resource_planet_multiverse_type) 
                 for _ in types:
-                    resources_planets_multiverse = [{'metal': rpm.metal, 'crystal': rpm.crystal, 'tritium': rpm.tritium, 'id': rpm.id} for rpm in planets_multiverse]
+                    resources_planets_multiverse = [{'carbon': rpm.carbon, 'diamond': rpm.diamond, 'magic': rpm.magic, 'id': rpm.id} for rpm in planets_multiverse]
 
                 resources_planets_multiverse_to_update = saveResourcesPlanetsMultiverse(resources_planets_multiverse)
 
-                PlanetsMultiverse.objects.bulk_update(resources_planets_multiverse_to_update, ['metal', 'crystal', 'tritium'], batch_size=len(resources_planets_multiverse_to_update))
+                PlanetsMultiverse.objects.bulk_update(resources_planets_multiverse_to_update, ['carbon', 'diamond', 'magic'], batch_size=len(resources_planets_multiverse_to_update))
                 
                           
             return JsonResponse({'msg': 'Ressources ajoutées'})

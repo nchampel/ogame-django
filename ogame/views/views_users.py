@@ -40,7 +40,7 @@ class RegisterAPIView(APIView):
             Users.objects.create(pseudo=pseudo, email=email, password=password_hashed, 
                                     created_at=timezone.now())
             user = Users.objects.latest('id')
-            buildings = ['metal', 'crystal', 'tritium', 'energy', 'unity-link_generator', 'ticket_generator']
+            buildings = ['carbon', 'diamond', 'magic', 'energy', 'unity-link_generator', 'ticket_generator', 'protective_dome']
             buildings_to_insert = []
             for building in buildings:
                 buildings_to_insert.append(Buildings(building_type=building, building_level=0, users_id=user.id, created_at=timezone.now()))
@@ -55,35 +55,50 @@ class RegisterAPIView(APIView):
                                                     item_used=0, item_bought=0, purchasable=purchasable,
                                                     created_at=timezone.now()))
             ShopItems.objects.bulk_create(shop_items_to_insert)
-            resources = ['metal', 'crystal', 'tritium', 'booster', 'satellites', 'unity-link']
+            resources = ['carbon', 'diamond', 'magic', 'booster', 'power_generator', 'unity-link', 'ticket']
             resources_to_insert = []
             for resource in resources:
                 value = 0
-                if resource == 'metal':
+                if resource == 'carbon':
                     value = 1000
-                if resource == 'crystal':
+                if resource == 'diamond':
                     value = 1000
                 if resource == 'booster':
                     value = 1
                 if resource == 'unity-link':
                     value = 500
+                if resource == 'ticket':
+                    value = 5
                 resources_to_insert.append(Resources(resource_type=resource, resource_value=value, users_id=user.id, created_at=timezone.now()))
             Resources.objects.bulk_create(resources_to_insert)
-            searches = ['life', 'fire', 'shield']
+            searches = ['life', 'fire', 'shield', 'time', 'electricity', 'energy']
             searches_to_insert = []
             for search in searches:
-                metal_value = 0
-                crystal_value = 0
-                tritium_value = 0
+                carbon_value = 0
+                diamond_value = 0
+                magic_value = 0
                 if search == 'fire':
-                    crystal_value = 50
+                    diamond_value = 50
                 if search == 'life':
-                    metal_value = 100
+                    carbon_value = 100
                 if search == 'shield':
-                    tritium_value = 20
+                    magic_value = 20
+                    diamond_value = 50
+                if search == 'time':
+                    carbon_value = 10000
+                    magic_value = 1000
+                    diamond_value = 5000
+                if search == 'electricity':
+                    carbon_value = 1000000
+                    magic_value = 100000
+                    diamond_value = 500000
+                if search == 'energy':
+                    carbon_value = 1000
+                    magic_value = 100
+                    diamond_value = 500
                 searches_to_insert.append(Searches(search_type=search, search_level=0, users_id=user.id, 
-                                                    metal=metal_value, crystal=crystal_value,
-                                                    tritium=tritium_value, created_at=timezone.now()))
+                                                    carbon=carbon_value, diamond=diamond_value,
+                                                    magic=magic_value, created_at=timezone.now()))
             Searches.objects.bulk_create(searches_to_insert)
             Starship.objects.create(is_built=0, fight_exp=0, users_id=user.id, created_at=timezone.now())
             
@@ -136,7 +151,7 @@ class LoginAPIView(APIView):
                     reponseJWT.data = {
                         'jwt': token,
                         'authenticated': True,
-                        'nature': user.nature
+                        'nature': user.nature,
                     }
                     return reponseJWT
                 else:
@@ -183,10 +198,11 @@ class VerifyJWTAPIView(APIView):
             # token = Token.objects.filter(user_id=1, token=token).first()
 
             if token:
-                return JsonResponse({'msg': 'Authentifié', 'nature': user.nature})
+                return JsonResponse({'msg': 'Authentifié', 'nature': user.nature, 'pseudo': user.pseudo,
+                        "isAdmin": user.is_admin,})
                 return Response('Authentifié')
             else:
-                return JsonResponse({'msg': 'Pas authentifié', 'nature': None})
+                return JsonResponse({'msg': 'Pas authentifié', 'nature': None, "isAdmin": False})
                 return Response('Pas authentifié')
         except:
             content = {
@@ -249,6 +265,13 @@ class SaveNatureAPIView(APIView):
         try:
             values = request.data['values']
             Users.objects.filter(id=user_id).update(nature=values['choice'])
+
+            user = Users.objects.filter(id=user_id).first()
+
+            description = "Essence du joueur " + user.pseudo + " déterminée : " + values['choice']
+
+            Logs.objects.create(type='joueur', category='alignement', users_id=user_id, description=description, target=user_id, created_at=timezone.now())
+
             return JsonResponse({'msg': 'alignement sauvegardé'})
             
         except:
