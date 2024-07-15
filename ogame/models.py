@@ -209,7 +209,7 @@ class Config(models.Model):
 class Success(models.Model):
     users = models.ForeignKey(Users, on_delete=models.RESTRICT, default=None, blank=True, null=True)
     success_resource_type = models.fields.CharField(max_length=50)
-    success_value = models.fields.IntegerField(default=0)
+    success_value = models.fields.BigIntegerField(default=0)
     is_won = models.fields.BooleanField(default=False)
     created_at = models.fields.DateTimeField(default=None, blank=True, null=True, max_length=0)
     class Meta:
