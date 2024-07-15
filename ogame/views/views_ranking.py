@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.utils import timezone
+from django.db.models import Q
 
 from ogame.models import Buildings, Users
 
@@ -13,7 +14,7 @@ class GetRankingAPIView(APIView):
         authenticate(request)
         try :
             buildings = Buildings.objects.values_list('users_id', 'building_level').order_by('users_id')
-            users = Users.objects.exclude(nature=None).values_list('id', 'nature', 'pseudo')
+            users = Users.objects.exclude(Q(nature=None) | Q(is_admin=True)).values_list('id', 'nature', 'pseudo')
             levels = [{'users_id': b[0], 'level': b[1]} for b in buildings]
             natures = {u[0]: u[1] for u in users}
             pseudos = {u[0]: u[2] for u in users}
