@@ -44,7 +44,9 @@ from ogame.views.views_ranking import GetRankingAPIView
 
 from ogame.views.views_workshop import SaveLogPowerGeneratorBuiltAPIView
 
-from ogame.views.views_player import SaveResourcesInvestedAPIView, GetIsWebsiteUnderMaintenanceAPIView
+from ogame.views.views_player import SaveResourcesInvestedAPIView, GetIsWebsiteUnderMaintenanceAPIView, \
+GetSuccessPlayerAPIView, SaveSuccessPlayerAPIView
+
 
 from ogame.views.views_test import testAPIView
 
@@ -102,6 +104,8 @@ urlpatterns = [
 
     path('player/resources/invested/save/', SaveResourcesInvestedAPIView.as_view()),
     path('website/maintenance/get/', GetIsWebsiteUnderMaintenanceAPIView.as_view()),
+    path('player/success/get/', GetSuccessPlayerAPIView.as_view()),
+    path('player/success/save/', SaveSuccessPlayerAPIView.as_view()),
     
     path('cron/resources/add/', CronAddResourcesAPIView.as_view()),
     # path('cron/unity-link/daily/', CronUnityLinkDailyAPIView.as_view()),

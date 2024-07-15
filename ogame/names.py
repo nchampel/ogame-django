@@ -1,0 +1,1 @@
+resources_names = {'carbon': 'Carbone', 'diamond': 'Diamants', 'magic': 'Magie'}

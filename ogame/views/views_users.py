@@ -10,7 +10,8 @@ from environ import Env
 import jwt, datetime as dt
 from typing import Dict
 
-from ogame.models import Users, Token, Buildings, Resources, Searches, Starship, Logs, ShopItems
+from ogame.models import Users, Token, Buildings, Resources, Searches, Starship, Logs, ShopItems, \
+Success
 
 from ogame.functions import authenticate
 
@@ -49,6 +50,7 @@ class RegisterAPIView(APIView):
             purchasable = False
             shop_items_to_insert = []
             for shop_item in shop_items:
+                purchasable = False
                 if shop_item == '1 hour':
                     purchasable = True
                 shop_items_to_insert.append(ShopItems(item_type=shop_item, item_quantity=0, users_id=user.id, 
@@ -60,9 +62,9 @@ class RegisterAPIView(APIView):
             for resource in resources:
                 value = 0
                 if resource == 'carbon':
-                    value = 1000
+                    value = 500
                 if resource == 'diamond':
-                    value = 1000
+                    value = 500
                 if resource == 'booster':
                     value = 1
                 if resource == 'unity-link':
@@ -100,6 +102,16 @@ class RegisterAPIView(APIView):
                                                     carbon=carbon_value, diamond=diamond_value,
                                                     magic=magic_value, created_at=timezone.now()))
             Searches.objects.bulk_create(searches_to_insert)
+            resources_for_success = ['carbon', 'diamond', 'magic']
+            values_success = [1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000]
+            resources_for_success_to_insert = []
+            for resource_for_success in resources_for_success:
+                for value_success in values_success:
+
+                    resources_for_success_to_insert.append(Success(success_resource_type=resource_for_success, users_id=user.id, 
+                                                        success_value=value_success, is_won=False,
+                                                        created_at=timezone.now()))
+            Success.objects.bulk_create(resources_for_success_to_insert)
             Starship.objects.create(is_built=0, fight_exp=0, users_id=user.id, created_at=timezone.now())
             
             return JsonResponse({'msg': 'Enregistré'})
