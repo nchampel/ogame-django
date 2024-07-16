@@ -162,7 +162,9 @@ class SaveLevelAPIView(APIView):
                 'diamond': "Raffinerie de diamants",
                 'magic': "Extracteur de magie",
                 'energy': "Génératrice d'énergie",
-                'protective_dome': "Dôme protecteur"
+                'protective_dome': "Dôme protecteur",
+                'unity-link_generator': "Générateur de Lien-Unités",
+                'ticket_generator': "Générateur de ticket"
             }
 
             description = "Bâtiment " + buildings_names[type] + " niveau " + str(level) + " obtenu"
