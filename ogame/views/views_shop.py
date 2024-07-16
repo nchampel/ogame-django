@@ -200,6 +200,7 @@ class SaveItemBoughtAPIView(APIView):
         user_id = authenticate(request)
         try :
             type = request.data['type']
+            link_unity_used = request.data['link_unity_used']
             next_item_purchasable = False
             purchasable = False
             shop_item = ShopItems.objects.filter(users_id=user_id, item_type=type).first()
@@ -227,7 +228,7 @@ class SaveItemBoughtAPIView(APIView):
                                                             item_bought=shop_item.item_bought + 1)
 
             resource = Resources.objects.filter(users_id=user_id, resource_type='unity-link').first()
-            Resources.objects.filter(users_id=user_id, resource_type='unity-link').update(resource_value=resource.resource_value - 500)
+            Resources.objects.filter(users_id=user_id, resource_type='unity-link').update(resource_value=resource.resource_value - link_unity_used)
 
             description = items_names[type] + " acheté"
 
@@ -237,7 +238,7 @@ class SaveItemBoughtAPIView(APIView):
             return JsonResponse({
                 'msg': "sauvegarde de l'utilisation de l'objet de la boutique réussie",
                 'purchasable': purchasable, 'quantity': shop_item.item_quantity + 1, 'type': type,
-                'unityLink': resource.resource_value - 500})
+                'unityLink': resource.resource_value - link_unity_used})
         except:
             content = {
                 'msg': "Erreur lors de la sauvegarde de l'utilisation de l'objet de la boutique"
