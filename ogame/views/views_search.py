@@ -21,18 +21,19 @@ class GetSearchLevelsAPIView(APIView):
             
             searches = Searches.objects.filter(users_id=user_id)
 
-            search_levels = {'life': 0, 'fire': 0, 'shield': 0, 'energy': 0, 'electricity': 0}
+            # search_levels = {'life': {}, 'fire': {}, 'shield': {}, 'energy': {}, 'electricity': {}, 'time': {}}
+            search_levels = {}
 
             for search in searches:
-                resources_needed = {'carbon': 0, 'diamond': 0, 'magic': 0}
+                # resources_needed = {'carbon': 0, 'diamond': 0, 'magic': 0}
 
-                for resource in resources_needed:
-                    resources_needed[resource] = getattr(search, resource)
+                # for resource in resources_needed:
+                #     resources_needed[resource] = getattr(search, resource)
                 search_levels[search.search_type] = {'level': search.search_level, 
                                                      'carbon': search.carbon,
                                                      'diamond': search.diamond,
                                                      'magic': search.magic}
-            # print(search_levels)
+            print(search_levels)
             return JsonResponse(search_levels)
                 
 
